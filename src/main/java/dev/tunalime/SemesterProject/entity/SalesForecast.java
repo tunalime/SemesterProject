@@ -25,6 +25,8 @@ public class SalesForecast {
     private String brand;
     private String model;
     private String packageType;
+    
+    @Column(name = "model_year")
     private Integer year;
     
     // The period for which the forecast is made

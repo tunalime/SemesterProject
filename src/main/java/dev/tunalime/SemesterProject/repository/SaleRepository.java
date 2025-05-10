@@ -14,7 +14,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     
     List<Sale> findByCustomerId(Long customerId);
     
-    List<Sale> findBySaleStatus(SaleStatus status);
+    List<Sale> findByStatus(SaleStatus status);
     
     List<Sale> findBySaleDateBetween(LocalDate startDate, LocalDate endDate);
     
