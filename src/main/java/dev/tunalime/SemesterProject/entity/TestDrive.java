@@ -43,9 +43,6 @@ public class TestDrive {
     @Column(columnDefinition = "TEXT")
     private String customerFeedback;
     
-    @Column(columnDefinition = "TEXT")
-    private String notes;
-    
     // Staff member who accompanied the test drive
     private String staffMemberName;
 } 

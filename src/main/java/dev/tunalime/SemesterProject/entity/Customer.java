@@ -36,16 +36,11 @@ public class Customer {
     
     private String address;
     
-    private LocalDate birthDate;
-    
     @Column(nullable = false)
     private LocalDate registrationDate;
     
     @Column(nullable = false)
     private CustomerStatus status;
-    
-    @Column(columnDefinition = "TEXT")
-    private String notes;
     
     // A customer can have many interactions
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)

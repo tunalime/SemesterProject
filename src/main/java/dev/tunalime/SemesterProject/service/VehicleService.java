@@ -71,7 +71,6 @@ public class VehicleService {
             // Update the existing stock item's quantity
             stockItem = stockItemOpt.get();
             stockItem.setTotalQuantity(stockItem.getTotalQuantity() + 1);
-            stockItem.setAvailableQuantity(stockItem.getAvailableQuantity() + 1);
         } else {
             // Create a new stock item for this vehicle type
             stockItem = new StockItem();
@@ -81,7 +80,6 @@ public class VehicleService {
             stockItem.setPackageType(vehicleDTO.getPackageType());
             stockItem.setBasePrice(vehicleDTO.getPrice());
             stockItem.setTotalQuantity(1);
-            stockItem.setAvailableQuantity(1);
         }
         
         // Save or update the stock item
@@ -96,7 +94,6 @@ public class VehicleService {
         vehicle.setVin(vehicleDTO.getVin());
         vehicle.setPrice(vehicleDTO.getPrice());
         vehicle.setColor(vehicleDTO.getColor());
-        vehicle.setMileage(vehicleDTO.getMileage());
         vehicle.setStockEntryDate(LocalDate.now());
         vehicle.setStatus(VehicleStatus.IN_STOCK);
         vehicle.setDescription(vehicleDTO.getDescription());
@@ -130,9 +127,7 @@ public class VehicleService {
             // Decrease count in the old stock item
             StockItem oldStockItem = vehicle.getStockItem();
             oldStockItem.setTotalQuantity(oldStockItem.getTotalQuantity() - 1);
-            if (vehicle.getStatus() == VehicleStatus.IN_STOCK || vehicle.getStatus() == VehicleStatus.IN_SHOWROOM) {
-                oldStockItem.setAvailableQuantity(oldStockItem.getAvailableQuantity() - 1);
-            }
+
             stockItemRepository.save(oldStockItem);
             
             // Find or create new stock item
@@ -143,9 +138,6 @@ public class VehicleService {
             if (newStockItemOpt.isPresent()) {
                 newStockItem = newStockItemOpt.get();
                 newStockItem.setTotalQuantity(newStockItem.getTotalQuantity() + 1);
-                if (vehicle.getStatus() == VehicleStatus.IN_STOCK || vehicle.getStatus() == VehicleStatus.IN_SHOWROOM) {
-                    newStockItem.setAvailableQuantity(newStockItem.getAvailableQuantity() + 1);
-                }
             } else {
                 newStockItem = new StockItem();
                 newStockItem.setBrand(vehicleDTO.getBrand());
@@ -154,8 +146,6 @@ public class VehicleService {
                 newStockItem.setPackageType(vehicleDTO.getPackageType());
                 newStockItem.setBasePrice(vehicleDTO.getPrice());
                 newStockItem.setTotalQuantity(1);
-                newStockItem.setAvailableQuantity(vehicle.getStatus() == VehicleStatus.IN_STOCK || 
-                                                 vehicle.getStatus() == VehicleStatus.IN_SHOWROOM ? 1 : 0);
             }
             
             newStockItem = stockItemRepository.save(newStockItem);
@@ -170,7 +160,6 @@ public class VehicleService {
         vehicle.setVin(vehicleDTO.getVin());
         vehicle.setPrice(vehicleDTO.getPrice());
         vehicle.setColor(vehicleDTO.getColor());
-        vehicle.setMileage(vehicleDTO.getMileage());
         vehicle.setDescription(vehicleDTO.getDescription());
         vehicle.setAvailableForTestDrive(vehicleDTO.isAvailableForTestDrive());
         
@@ -198,17 +187,6 @@ public class VehicleService {
         // Update stock item available quantity if necessary
         StockItem stockItem = vehicle.getStockItem();
         
-        // If vehicle was previously available and now is not
-        if ((oldStatus == VehicleStatus.IN_STOCK || oldStatus == VehicleStatus.IN_SHOWROOM) &&
-            (newStatus != VehicleStatus.IN_STOCK && newStatus != VehicleStatus.IN_SHOWROOM)) {
-            stockItem.setAvailableQuantity(stockItem.getAvailableQuantity() - 1);
-        }
-        // If vehicle was previously unavailable and now is available
-        else if ((oldStatus != VehicleStatus.IN_STOCK && oldStatus != VehicleStatus.IN_SHOWROOM) &&
-                 (newStatus == VehicleStatus.IN_STOCK || newStatus == VehicleStatus.IN_SHOWROOM)) {
-            stockItem.setAvailableQuantity(stockItem.getAvailableQuantity() + 1);
-        }
-        
         stockItemRepository.save(stockItem);
         vehicle = vehicleRepository.save(vehicle);
         
@@ -228,11 +206,7 @@ public class VehicleService {
         // Update stock item quantities
         StockItem stockItem = vehicle.getStockItem();
         stockItem.setTotalQuantity(stockItem.getTotalQuantity() - 1);
-        
-        if (vehicle.getStatus() == VehicleStatus.IN_STOCK || vehicle.getStatus() == VehicleStatus.IN_SHOWROOM) {
-            stockItem.setAvailableQuantity(stockItem.getAvailableQuantity() - 1);
-        }
-        
+
         stockItemRepository.save(stockItem);
         vehicleRepository.delete(vehicle);
     }
@@ -304,7 +278,6 @@ public class VehicleService {
         dto.setVin(vehicle.getVin());
         dto.setPrice(vehicle.getPrice());
         dto.setColor(vehicle.getColor());
-        dto.setMileage(vehicle.getMileage());
         dto.setStockEntryDate(vehicle.getStockEntryDate());
         dto.setStatus(vehicle.getStatus());
         dto.setDescription(vehicle.getDescription());

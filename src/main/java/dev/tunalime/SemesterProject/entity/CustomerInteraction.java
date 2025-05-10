@@ -32,9 +32,6 @@ public class CustomerInteraction {
     @Column(nullable = false)
     private InteractionType type;
     
-    @Column(columnDefinition = "TEXT")
-    private String notes;
-    
     // If the interaction is related to a specific vehicle
     @ManyToOne
     @JoinColumn(name = "vehicle_id")
