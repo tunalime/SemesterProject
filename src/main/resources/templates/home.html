@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Ana Sayfa')">
+    <meta charset="UTF-8">
+    <title>Ana Sayfa</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('home')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <h1 class="mb-4">Gösterge Paneli</h1>
+        
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Toplam Araç</h5>
+                        <p class="card-text display-4" th:text="${totalVehicles}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Toplam Müşteri</h5>
+                        <p class="card-text display-4" th:text="${totalCustomers}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Toplam Satış</h5>
+                        <p class="card-text display-4" th:text="${totalSales}">0</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-dark dashboard-card">
+                    <div class="card-body">
+                        <h5 class="card-title">Son 30 Gün Satış</h5>
+                        <p class="card-text display-4" th:text="${recentSales}">0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Araç Durumu</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="vehicleStatusChart"></canvas>
+                        <!-- Hidden data for chart -->
+                        <div class="d-none">
+                            <span id="inStockVehicles" th:text="${inStockVehicles}">0</span>
+                            <span id="inShowroomVehicles" th:text="${inShowroomVehicles}">0</span>
+                            <span id="reservedVehicles" th:text="${reservedVehicles}">0</span>
+                            <span id="soldVehicles" th:text="${soldVehicles}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Aylık Satışlar (<span th:text="${currentYear}">2023</span>)</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="monthlySalesChart"></canvas>
+                        <!-- Hidden data for chart -->
+                        <div class="d-none" id="monthlySalesData" th:attr="data-sales=${monthlySales}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Hızlı Erişim</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="list-group">
+                            <a th:href="@{/vehicles/add}" class="list-group-item list-group-item-action">Yeni Araç Ekle</a>
+                            <a th:href="@{/customers/add}" class="list-group-item list-group-item-action">Yeni Müşteri Ekle</a>
+                            <a th:href="@{/vehicles/test-drive}" class="list-group-item list-group-item-action">Test Sürüş İçin Uygun Araçlar</a>
+                            <a th:href="@{/forecasts/generate}" class="list-group-item list-group-item-action">Satış Tahmini Oluştur</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Satış Durumu</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="salesStatusChart"></canvas>
+                        <!-- Hidden data for chart -->
+                        <div class="d-none">
+                            <span id="completedSales" th:text="${completedSales}">0</span>
+                            <span id="pendingSales" th:text="${pendingSales}">0</span>
+                            <span id="otherSales" th:text="${totalSales - completedSales - pendingSales}">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Vehicle Status Chart
+        const vehicleStatusChart = new Chart(document.getElementById('vehicleStatusChart'), {
+            type: 'pie',
+            data: {
+                labels: ['Stokta', 'Showroomda', 'Rezerve Edilmiş', 'Satılmış'],
+                datasets: [{
+                    data: [
+                        parseInt(document.getElementById('inStockVehicles').textContent),
+                        parseInt(document.getElementById('inShowroomVehicles').textContent),
+                        parseInt(document.getElementById('reservedVehicles').textContent),
+                        parseInt(document.getElementById('soldVehicles').textContent)
+                    ],
+                    backgroundColor: ['#36a2eb', '#ff6384', '#ffcd56', '#4bc0c0']
+                }]
+            }
+        });
+        
+        // Monthly Sales Chart
+        // We'll need to parse the monthlySales data attribute in JavaScript
+        const monthlySalesChart = new Chart(document.getElementById('monthlySalesChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+                datasets: [{
+                    label: 'Satış Sayısı',
+                    data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Default data, will be updated
+                    backgroundColor: '#4bc0c0'
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+        
+        // Sales Status Chart
+        const salesStatusChart = new Chart(document.getElementById('salesStatusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Tamamlanmış', 'Bekleyen', 'Diğer'],
+                datasets: [{
+                    data: [
+                        parseInt(document.getElementById('completedSales').textContent),
+                        parseInt(document.getElementById('pendingSales').textContent),
+                        parseInt(document.getElementById('otherSales').textContent)
+                    ],
+                    backgroundColor: ['#4bc0c0', '#ffcd56', '#ff6384']
+                }]
+            }
+        });
+    </script>
+    
+    <style>
+        .dashboard-card {
+            transition: transform 0.3s ease;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</body>
+</html> 
