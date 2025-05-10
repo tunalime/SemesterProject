@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Hakkında')">
+    <meta charset="UTF-8">
+    <title>Hakkında</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('about')"></nav>
+
+    <div class="container my-5">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h1 class="h3 mb-0">Birinci El Araç Satış Bilgi Sistemi</h1>
+                    </div>
+                    <div class="card-body">
+                        <h2 class="h4 mb-3">Proje Hakkında</h2>
+                        <p>Bu proje, birinci el araç satış firmalarına yönelik geliştirilmiş bir bilgi sistemidir. Sistem, araçların stoğa girişinden müşteriye teslimatına kadar olan iş akışlarını yönetmek için tasarlanmıştır.</p>
+                        
+                        <h2 class="h4 mb-3 mt-4">Sistem Özellikleri</h2>
+                        <ul>
+                            <li>Araç stok yönetimi</li>
+                            <li>Müşteri kaydı ve takibi</li>
+                            <li>Test sürüş planlama ve takibi</li>
+                            <li>Satış işlemleri yönetimi</li>
+                            <li>Detaylı raporlama ve analizler</li>
+                            <li>Satış tahminleme (Hareketli Ortalama Yöntemi)</li>
+                        </ul>
+                        
+                        <h2 class="h4 mb-3 mt-4">Proje Ekibi</h2>
+                        <p>Bu proje, Yazılım Mühendisliği dersi için geliştirilmiştir.</p>
+                        
+                        <h2 class="h4 mb-3 mt-4">Teknolojiler</h2>
+                        <ul>
+                            <li>Spring Boot</li>
+                            <li>Spring Data JPA</li>
+                            <li>Thymeleaf</li>
+                            <li>Bootstrap</li>
+                            <li>PostgreSQL</li>
+                            <li>Chart.js</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 
