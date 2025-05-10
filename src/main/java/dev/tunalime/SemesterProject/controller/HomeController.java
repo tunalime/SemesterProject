@@ -61,8 +61,8 @@ public class HomeController {
         
         // Sales stats
         long totalSales = saleRepository.count();
-        long completedSales = saleRepository.findBySaleStatus(SaleStatus.COMPLETED).size();
-        long pendingSales = saleRepository.findBySaleStatus(SaleStatus.PENDING).size();
+        long completedSales = saleRepository.findByStatus(SaleStatus.COMPLETED).size();
+        long pendingSales = saleRepository.findByStatus(SaleStatus.PENDING).size();
         
         model.addAttribute("totalSales", totalSales);
         model.addAttribute("completedSales", completedSales);
