@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Araç Detayları')">
+    <meta charset="UTF-8">
+    <title>Araç Detayları</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('vehicles')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <a th:href="@{/vehicles}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Listeye Dön
+                </a>
+                <h1 class="d-inline-block ms-3" th:text="${vehicle.brand + ' ' + vehicle.model + ' ' + vehicle.year}">Toyota Corolla 2023</h1>
+            </div>
+            <div>
+                <a th:href="@{/vehicles/{id}/edit(id=${vehicle.id})}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Düzenle
+                </a>
+                <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="bi bi-trash"></i> Sil
+                </button>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Araç Bilgileri -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Araç Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p><strong>ID:</strong> <span th:text="${vehicle.id}">1</span></p>
+                                <p><strong>Marka:</strong> <span th:text="${vehicle.brand}">Toyota</span></p>
+                                <p><strong>Model:</strong> <span th:text="${vehicle.model}">Corolla</span></p>
+                                <p><strong>Yıl:</strong> <span th:text="${vehicle.year}">2023</span></p>
+                                <p><strong>Paket:</strong> <span th:text="${vehicle.packageType}">Premium</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>VIN:</strong> <span th:text="${vehicle.vin}">JT2BF22K1W0123456</span></p>
+                                <p><strong>Renk:</strong> <span th:text="${vehicle.color}">Beyaz</span></p>
+                                <p><strong>Kilometre:</strong> <span th:text="${vehicle.mileage}">0</span> km</p>
+                                <p><strong>Stok Giriş Tarihi:</strong> <span th:text="${#temporals.format(vehicle.stockEntryDate, 'dd/MM/yyyy')}">01/01/2023</span></p>
+                                <p><strong>Test Sürüşü İçin Uygun:</strong> <span th:text="${vehicle.availableForTestDrive ? 'Evet' : 'Hayır'}">Evet</span></p>
+                            </div>
+                        </div>
+                        
+                        <p><strong>Fiyat:</strong> <span th:text="${#numbers.formatDecimal(vehicle.price, 0, 'COMMA', 2, 'POINT')} + ' TL'">350,000.00 TL</span></p>
+                        
+                        <div class="mb-3">
+                            <strong>Açıklama:</strong>
+                            <p th:text="${vehicle.description}">Detaylı araç açıklaması...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Durum Bilgisi ve Hızlı İşlemler -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Durum</h5>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <span th:class="${'badge rounded-pill fs-6 ' + 
+                                 (vehicle.status == T(dev.tunalime.SemesterProject.entity.VehicleStatus).IN_STOCK ? 'bg-primary' : 
+                                  vehicle.status == T(dev.tunalime.SemesterProject.entity.VehicleStatus).IN_SHOWROOM ? 'bg-info' : 
+                                  vehicle.status == T(dev.tunalime.SemesterProject.entity.VehicleStatus).RESERVED ? 'bg-warning' :
+                                  vehicle.status == T(dev.tunalime.SemesterProject.entity.VehicleStatus).SOLD ? 'bg-success' : 
+                                  vehicle.status == T(dev.tunalime.SemesterProject.entity.VehicleStatus).DELIVERED ? 'bg-secondary' : 'bg-dark')}" 
+                                 th:text="${vehicle.status}">
+                                IN_STOCK
+                            </span>
+                        </div>
+                        
+                        <!-- Durum Değiştirme Formu -->
+                        <form th:action="@{/vehicles/{id}/status(id=${vehicle.id})}" method="post" class="mt-4">
+                            <div class="mb-3">
+                                <label for="status" class="form-label">Durum Değiştir</label>
+                                <select class="form-select" id="status" name="status">
+                                    <option th:each="statusOpt : ${T(dev.tunalime.SemesterProject.entity.VehicleStatus).values()}"
+                                            th:value="${statusOpt}" 
+                                            th:text="${statusOpt}"
+                                            th:selected="${statusOpt == vehicle.status}"></option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-success">Durumu Güncelle</button>
+                        </form>
+                    </div>
+                </div>
+                
+                <!-- Hızlı İşlemler -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Hızlı İşlemler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/test-drives/add?vehicleId={id}(id=${vehicle.id})}" class="btn btn-outline-primary">
+                                <i class="bi bi-car-front"></i> Test Sürüşü Planla
+                            </a>
+                            <a th:href="@{/sales/add?vehicleId={id}(id=${vehicle.id})}" class="btn btn-outline-success">
+                                <i class="bi bi-cash-coin"></i> Satış İşlemi Başlat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Aracı Sil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bu aracı silmek istediğinize emin misiniz? Bu işlem geri alınamaz.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                    <form th:action="@{/vehicles/{id}/delete(id=${vehicle.id})}" method="post">
+                        <button type="submit" class="btn btn-danger">Sil</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 

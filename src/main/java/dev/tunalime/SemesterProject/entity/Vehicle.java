@@ -42,8 +42,6 @@ public class Vehicle {
     
     private String color;
     
-    private Integer mileage;
-    
     @Column(nullable = false)
     private LocalDate stockEntryDate;
     

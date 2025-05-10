@@ -94,7 +94,6 @@ public class VehicleService {
         vehicle.setVin(vehicleDTO.getVin());
         vehicle.setPrice(vehicleDTO.getPrice());
         vehicle.setColor(vehicleDTO.getColor());
-        vehicle.setMileage(vehicleDTO.getMileage());
         vehicle.setStockEntryDate(LocalDate.now());
         vehicle.setStatus(VehicleStatus.IN_STOCK);
         vehicle.setDescription(vehicleDTO.getDescription());
@@ -161,7 +160,6 @@ public class VehicleService {
         vehicle.setVin(vehicleDTO.getVin());
         vehicle.setPrice(vehicleDTO.getPrice());
         vehicle.setColor(vehicleDTO.getColor());
-        vehicle.setMileage(vehicleDTO.getMileage());
         vehicle.setDescription(vehicleDTO.getDescription());
         vehicle.setAvailableForTestDrive(vehicleDTO.isAvailableForTestDrive());
         
@@ -280,7 +278,6 @@ public class VehicleService {
         dto.setVin(vehicle.getVin());
         dto.setPrice(vehicle.getPrice());
         dto.setColor(vehicle.getColor());
-        dto.setMileage(vehicle.getMileage());
         dto.setStockEntryDate(vehicle.getStockEntryDate());
         dto.setStatus(vehicle.getStatus());
         dto.setDescription(vehicle.getDescription());

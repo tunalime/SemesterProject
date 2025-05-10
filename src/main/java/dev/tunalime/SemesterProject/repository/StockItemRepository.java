@@ -1,6 +1,7 @@
 package dev.tunalime.SemesterProject.repository;
 
 import dev.tunalime.SemesterProject.entity.StockItem;
+import dev.tunalime.SemesterProject.entity.VehicleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -22,7 +23,7 @@ public interface StockItemRepository extends JpaRepository<StockItem, Long> {
     Optional<StockItem> findByBrandAndModelAndYearAndPackageType(
             String brand, String model, Integer year, String packageType);
     
-    @Query("SELECT s FROM StockItem s WHERE s.availableQuantity > 0")
+    @Query("SELECT s FROM StockItem s JOIN s.vehicles v WHERE v.status = 'IN_STOCK' OR v.status = 'IN_SHOWROOM' GROUP BY s")
     List<StockItem> findAllWithAvailableVehicles();
     
     @Query("SELECT DISTINCT s.brand FROM StockItem s ORDER BY s.brand")
