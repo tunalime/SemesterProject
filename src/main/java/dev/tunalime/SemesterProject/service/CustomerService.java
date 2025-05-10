@@ -78,10 +78,8 @@ public class CustomerService {
         customer.setEmail(customerDTO.getEmail());
         customer.setPhone(customerDTO.getPhone());
         customer.setAddress(customerDTO.getAddress());
-        customer.setBirthDate(customerDTO.getBirthDate());
         customer.setRegistrationDate(LocalDate.now());
         customer.setStatus(CustomerStatus.LEAD); // Default status for new customers
-        customer.setNotes(customerDTO.getNotes());
         
         customer = customerRepository.save(customer);
         
@@ -112,9 +110,7 @@ public class CustomerService {
         customer.setEmail(customerDTO.getEmail());
         customer.setPhone(customerDTO.getPhone());
         customer.setAddress(customerDTO.getAddress());
-        customer.setBirthDate(customerDTO.getBirthDate());
         customer.setStatus(customerDTO.getStatus());
-        customer.setNotes(customerDTO.getNotes());
         
         customer = customerRepository.save(customer);
         
@@ -234,10 +230,8 @@ public class CustomerService {
         dto.setEmail(customer.getEmail());
         dto.setPhone(customer.getPhone());
         dto.setAddress(customer.getAddress());
-        dto.setBirthDate(customer.getBirthDate());
         dto.setRegistrationDate(customer.getRegistrationDate());
         dto.setStatus(customer.getStatus());
-        dto.setNotes(customer.getNotes());
         
         return dto;
     }

@@ -17,7 +17,8 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class StockItem {
+public class
+StockItem {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,10 +41,7 @@ public class StockItem {
     
     @Column(nullable = false)
     private Integer totalQuantity;
-    
-    @Column(nullable = false)
-    private Integer availableQuantity;
-    
+
     @Column(columnDefinition = "TEXT")
     private String specifications;
     

@@ -33,8 +33,6 @@ public class Sale {
     @Column(nullable = false)
     private LocalDate saleDate;
     
-    private LocalDate deliveryDate;
-    
     @Column(nullable = false)
     private BigDecimal salePrice;
     
@@ -43,9 +41,6 @@ public class Sale {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private SaleStatus status;
-    
-    @Column(columnDefinition = "TEXT")
-    private String notes;
     
     // Sales employee who made the sale
     private String salesEmployeeName;
