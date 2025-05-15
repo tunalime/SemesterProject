@@ -3,13 +3,14 @@ package dev.tunalime.SemesterProject.repository;
 import dev.tunalime.SemesterProject.entity.Vehicle;
 import dev.tunalime.SemesterProject.entity.VehicleStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface VehicleRepository extends JpaRepository<Vehicle, Long> {
+public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpecificationExecutor<Vehicle> {
     
     List<Vehicle> findByBrand(String brand);
     

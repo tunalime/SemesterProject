@@ -10,8 +10,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -224,26 +226,42 @@ public class VehicleService {
     public List<VehicleDTO> searchVehicles(String brand, String model, Integer year, String packageType, VehicleStatus status) {
         List<Vehicle> vehicles;
         
-        if (brand != null && model != null && year != null && packageType != null && status != null) {
-            vehicles = vehicleRepository.findByBrandAndModelAndYearAndPackageTypeAndStatus(brand, model, year, packageType, status);
-        } else if (brand != null && model != null && year != null && packageType != null) {
-            vehicles = vehicleRepository.findByBrandAndModelAndYearAndPackageType(brand, model, year, packageType);
-        } else if (brand != null && model != null && year != null) {
-            vehicles = vehicleRepository.findByBrandAndModelAndYear(brand, model, year);
-        } else if (brand != null && model != null) {
-            vehicles = vehicleRepository.findByBrandAndModel(brand, model);
-        } else if (brand != null) {
-            vehicles = vehicleRepository.findByBrand(brand);
-        } else if (model != null) {
-            vehicles = vehicleRepository.findByModel(model);
-        } else if (year != null) {
-            vehicles = vehicleRepository.findByYear(year);
-        } else if (packageType != null) {
-            vehicles = vehicleRepository.findByPackageType(packageType);
-        } else if (status != null) {
-            vehicles = vehicleRepository.findByStatus(status);
+        // Create a dynamic query based on which parameters are not null
+        if (brand != null && !brand.trim().isEmpty() && 
+            model != null && !model.trim().isEmpty() && 
+            year != null && 
+            packageType != null && !packageType.trim().isEmpty() && 
+            status != null) {
+            // All parameters provided
+            vehicles = vehicleRepository.findByBrandAndModelAndYearAndPackageTypeAndStatus(
+                brand, model, year, packageType, status);
         } else {
-            vehicles = vehicleRepository.findAll();
+            // Use Spring's Specification API for dynamic queries with nullable parameters
+            vehicles = vehicleRepository.findAll((root, query, cb) -> {
+                java.util.List<Predicate> predicates = new java.util.ArrayList<>();
+                
+                if (brand != null && !brand.trim().isEmpty()) {
+                    predicates.add(cb.equal(root.get("brand"), brand));
+                }
+                
+                if (model != null && !model.trim().isEmpty()) {
+                    predicates.add(cb.equal(root.get("model"), model));
+                }
+                
+                if (year != null) {
+                    predicates.add(cb.equal(root.get("year"), year));
+                }
+                
+                if (packageType != null && !packageType.trim().isEmpty()) {
+                    predicates.add(cb.equal(root.get("packageType"), packageType));
+                }
+                
+                if (status != null) {
+                    predicates.add(cb.equal(root.get("status"), status));
+                }
+                
+                return cb.and(predicates.toArray(new Predicate[0]));
+            });
         }
         
         return vehicles.stream()

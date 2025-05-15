@@ -14,10 +14,10 @@
             <h1>Müşteri Arama Sonuçları</h1>
             <div>
                 <a th:href="@{/customers}" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Tüm Müşterilere Dön
+                    <i class="bi bi-arrow-left"></i> Müşteri Listesine Dön
                 </a>
                 <a th:href="@{/customers/add}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Yeni Müşteri Ekle
+                    <i class="bi bi-plus-lg"></i> Yeni Müşteri Ekle
                 </a>
             </div>
         </div>
@@ -37,18 +37,39 @@
             </div>
             <div class="card-body">
                 <form th:action="@{/customers/search}" method="get" class="row g-3">
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="firstName" class="form-label">Ad</label>
                         <input type="text" class="form-control" id="firstName" name="firstName" th:value="${firstName}">
                     </div>
-                    <div class="col-md-5">
+                    <div class="col-md-4">
                         <label for="lastName" class="form-label">Soyad</label>
                         <input type="text" class="form-control" id="lastName" name="lastName" th:value="${lastName}">
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success w-100">
+                    <div class="col-md-4">
+                        <label for="email" class="form-label">E-posta</label>
+                        <input type="email" class="form-control" id="email" name="email" th:value="${email}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="phone" class="form-label">Telefon</label>
+                        <input type="text" class="form-control" id="phone" name="phone" th:value="${phone}">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="status" class="form-label">Durumu</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">-- Seçiniz --</option>
+                            <option th:each="statusOption : ${statuses}" 
+                                    th:value="${statusOption}" 
+                                    th:text="${statusOption}" 
+                                    th:selected="${statusOption == status}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success me-2">
                             <i class="bi bi-search"></i> Ara
                         </button>
+                        <a th:href="@{/customers/search}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-lg"></i> Temizle
+                        </a>
                     </div>
                 </form>
             </div>

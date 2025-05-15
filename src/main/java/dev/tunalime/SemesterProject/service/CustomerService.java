@@ -11,6 +11,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import jakarta.persistence.criteria.Predicate;
 
 /**
  * Service for customer operations
@@ -156,13 +158,20 @@ public class CustomerService {
     public List<CustomerDTO> searchCustomersByName(String firstName, String lastName) {
         List<Customer> customers;
         
-        if (firstName != null && lastName != null) {
-            customers = customerRepository.findByFirstNameAndLastName(firstName, lastName);
-        } else if (lastName != null) {
-            customers = customerRepository.findByLastName(lastName);
-        } else {
-            customers = customerRepository.findAll();
-        }
+        // Use dynamic query with Specification API
+        customers = customerRepository.findAll((root, query, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            
+            if (firstName != null && !firstName.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("firstName"), firstName));
+            }
+            
+            if (lastName != null && !lastName.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("lastName"), lastName));
+            }
+            
+            return predicates.isEmpty() ? null : cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        });
         
         return customers.stream()
                 .map(this::convertToDTO)
@@ -212,6 +221,49 @@ public class CustomerService {
      */
     public List<CustomerDTO> getCustomersRegisteredBetween(LocalDate startDate, LocalDate endDate) {
         return customerRepository.findByRegistrationDateBetween(startDate, endDate).stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * Advanced search for customers by multiple criteria
+     * 
+     * @param firstName First name (optional)
+     * @param lastName Last name (optional)
+     * @param email Email (optional)
+     * @param phone Phone (optional)
+     * @param status Status (optional)
+     * @return List of matching customers
+     */
+    public List<CustomerDTO> advancedSearch(String firstName, String lastName, String email, 
+                                           String phone, CustomerStatus status) {
+        List<Customer> customers = customerRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            
+            if (firstName != null && !firstName.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("firstName"), firstName));
+            }
+            
+            if (lastName != null && !lastName.trim().isEmpty()) {
+                predicates.add(cb.equal(root.get("lastName"), lastName));
+            }
+            
+            if (email != null && !email.trim().isEmpty()) {
+                predicates.add(cb.like(root.get("email"), "%" + email + "%"));
+            }
+            
+            if (phone != null && !phone.trim().isEmpty()) {
+                predicates.add(cb.like(root.get("phone"), "%" + phone + "%"));
+            }
+            
+            if (status != null) {
+                predicates.add(cb.equal(root.get("status"), status));
+            }
+            
+            return predicates.isEmpty() ? null : cb.and(predicates.toArray(new Predicate[0]));
+        });
+        
+        return customers.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }

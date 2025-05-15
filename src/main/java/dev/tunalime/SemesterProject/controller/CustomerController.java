@@ -148,11 +148,18 @@ public class CustomerController {
     @GetMapping("/search")
     public String searchCustomers(@RequestParam(required = false) String firstName,
                                  @RequestParam(required = false) String lastName,
+                                 @RequestParam(required = false) String email,
+                                 @RequestParam(required = false) String phone,
+                                 @RequestParam(required = false) CustomerStatus status,
                                  Model model) {
-        List<CustomerDTO> customers = customerService.searchCustomersByName(firstName, lastName);
+        List<CustomerDTO> customers = customerService.advancedSearch(firstName, lastName, email, phone, status);
         model.addAttribute("customers", customers);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
+        model.addAttribute("email", email);
+        model.addAttribute("phone", phone);
+        model.addAttribute("status", status);
+        model.addAttribute("statuses", CustomerStatus.values());
         return "customers/search-results";
     }
     
@@ -239,9 +246,12 @@ public class CustomerController {
     @ResponseBody
     public ResponseEntity<List<CustomerDTO>> searchCustomersApi(
             @RequestParam(required = false) String firstName,
-            @RequestParam(required = false) String lastName) {
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone,
+            @RequestParam(required = false) CustomerStatus status) {
         
-        List<CustomerDTO> customers = customerService.searchCustomersByName(firstName, lastName);
+        List<CustomerDTO> customers = customerService.advancedSearch(firstName, lastName, email, phone, status);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 } 

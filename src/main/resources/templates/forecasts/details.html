@@ -100,7 +100,8 @@
                         <div th:if="${forecast.actualQuantity != null}">
                             <div class="mb-3">
                                 <div class="fw-bold mb-2">Doğruluk Oranı:</div>
-                                <div th:with="accuracy=${(forecast.actualQuantity / forecast.forecastedQuantity) * 100}">
+                                <div th:if="${forecast.forecastedQuantity != null && forecast.forecastedQuantity > 0}"
+                                     th:with="accuracy=${(forecast.actualQuantity / forecast.forecastedQuantity) * 100}">
                                     <div class="progress">
                                         <div class="progress-bar" 
                                              th:classappend="${accuracy >= 90} ? 'bg-success' : (${accuracy >= 70} ? 'bg-info' : 'bg-warning')"
@@ -109,11 +110,16 @@
                                              th:text="${#numbers.formatDecimal(accuracy, 1, 1) + '%'}">75%</div>
                                     </div>
                                 </div>
+                                <div th:if="${forecast.forecastedQuantity == null || forecast.forecastedQuantity == 0}" 
+                                     class="alert alert-warning">
+                                    <i class="bi bi-exclamation-triangle"></i> Tahmin edilen miktar sıfır veya geçersiz olduğundan doğruluk hesaplanamıyor.
+                                </div>
                             </div>
                             
                             <div class="mb-3">
                                 <div class="fw-bold mb-2">Sapma:</div>
-                                <div th:with="deviation=${forecast.forecastedQuantity - forecast.actualQuantity}">
+                                <div th:if="${forecast.forecastedQuantity != null}"
+                                     th:with="deviation=${forecast.forecastedQuantity - forecast.actualQuantity}">
                                     <span th:if="${deviation > 0}" class="text-danger">
                                         <i class="bi bi-arrow-up"></i> Tahmin çok yüksek:
                                         <span th:text="${deviation}">2</span> adet
@@ -125,6 +131,9 @@
                                     <span th:if="${deviation == 0}" class="text-success">
                                         <i class="bi bi-check-circle"></i> Tam isabet!
                                     </span>
+                                </div>
+                                <div th:unless="${forecast.forecastedQuantity != null}" class="text-muted">
+                                    Tahmin edilen miktar geçersiz olduğundan sapma hesaplanamıyor.
                                 </div>
                             </div>
                         </div>
