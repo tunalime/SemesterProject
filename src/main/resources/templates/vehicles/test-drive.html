@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Test Sürüşü İçin Uygun Araçlar')">
+    <meta charset="UTF-8">
+    <title>Test Sürüşü İçin Uygun Araçlar</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('vehicles')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Test Sürüşü İçin Uygun Araçlar</h1>
+            <div>
+                <a th:href="@{/vehicles}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Tüm Araçlara Dön
+                </a>
+            </div>
+        </div>
+        
+        <!-- Bilgi Notu -->
+        <div class="alert alert-info mb-4">
+            <i class="bi bi-info-circle"></i> Bu sayfada test sürüşüne uygun araçları görüntüleyebilirsiniz. 
+            Bu araçlar şu anda satışta ve test sürüşü için müsaittir.
+        </div>
+        
+        <!-- Araç Listesi -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    Test Sürüşü İçin Uygun Araçlar
+                    <span class="badge bg-secondary ms-2" th:text="${vehicles.size()}">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${vehicles.isEmpty()}" class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Şu anda test sürüşü için uygun araç bulunmamaktadır.
+                </div>
+                
+                <div th:if="${!vehicles.isEmpty()}">
+                    <div class="row row-cols-1 row-cols-md-3 g-4">
+                        <div class="col" th:each="vehicle : ${vehicles}">
+                            <div class="card h-100 border-success">
+                                <div class="card-header bg-success text-white">
+                                    <span class="badge bg-warning float-end">Test Sürüşüne Uygun</span>
+                                    <h5 class="card-title mb-0" th:text="${vehicle.brand + ' ' + vehicle.model}">Toyota Corolla</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p class="card-text mb-2">
+                                        <strong>Yıl:</strong> <span th:text="${vehicle.year}">2023</span>
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Paket:</strong> <span th:text="${vehicle.packageType}">Premium</span>
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Kilometre:</strong> <span th:text="${vehicle.mileage}">15000</span> km
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Fiyat:</strong> <span th:text="${vehicle.price + ' TL'}">550000 TL</span>
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Renk:</strong> <span th:text="${vehicle.color}">Beyaz</span>
+                                    </p>
+                                    <p class="card-text mb-2">
+                                        <strong>Motor:</strong> <span th:text="${vehicle.engineSize}">1.6</span>
+                                    </p>
+                                </div>
+                                <div class="card-footer">
+                                    <div class="d-flex justify-content-between">
+                                        <a th:href="@{/vehicles/{id}(id=${vehicle.id})}" class="btn btn-success">
+                                            <i class="bi bi-eye"></i> Detayları Görüntüle
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Test Sürüşü Randevusu Hakkında Bilgi -->
+        <div class="card mt-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Test Sürüşü Randevusu Alın</h5>
+            </div>
+            <div class="card-body">
+                <p>Test sürüşü randevusu almak için aşağıdaki adımları izleyin:</p>
+                <ol>
+                    <li>İlgilendiğiniz aracın detaylarını görüntüleyin.</li>
+                    <li>Araç detay sayfasındaki "Test Sürüşü Randevusu Al" butonuna tıklayın.</li>
+                    <li>Size uygun tarih ve saati seçin.</li>
+                    <li>Randevunuz onaylandığında e-posta veya SMS ile bilgilendirileceksiniz.</li>
+                </ol>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Test sürüşü için geçerli bir ehliyet ve kimlik getirmeniz gerekmektedir.
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 

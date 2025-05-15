@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Müşteriler - Durum Bazlı')">
+    <meta charset="UTF-8">
+    <title>Müşteriler - Durum Bazlı</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('customers')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <span th:switch="${status}">
+                    <span th:case="'LEAD'">Potansiyel Müşteriler</span>
+                    <span th:case="'PROSPECT'">Beklenen Müşteriler</span>
+                    <span th:case="'CUSTOMER'">Aktif Müşteriler</span>
+                    <span th:case="'INACTIVE'">İnaktif Müşteriler</span>
+                    <span th:case="*" th:text="${status + ' Müşteriler'}">Diğer Müşteriler</span>
+                </span>
+            </h1>
+            <div>
+                <a th:href="@{/customers}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Tüm Müşterilere Dön
+                </a>
+                <a th:href="@{/customers/add}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Yeni Müşteri Ekle
+                </a>
+            </div>
+        </div>
+        
+        <!-- Durum Filtreleri -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Müşteri Durumu Bazlı Filtreler</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3">
+                        <a th:href="@{/customers/status/LEAD}" 
+                           th:class="${status == 'LEAD'} ? 'btn btn-primary w-100 mb-2' : 'btn btn-outline-primary w-100 mb-2'">
+                            <i class="bi bi-people"></i> Potansiyel Müşteriler
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/customers/status/PROSPECT}" 
+                           th:class="${status == 'PROSPECT'} ? 'btn btn-info w-100 mb-2' : 'btn btn-outline-info w-100 mb-2'">
+                            <i class="bi bi-person-check"></i> Beklenen Müşteriler
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/customers/status/CUSTOMER}" 
+                           th:class="${status == 'CUSTOMER'} ? 'btn btn-success w-100 mb-2' : 'btn btn-outline-success w-100 mb-2'">
+                            <i class="bi bi-person-check-fill"></i> Aktif Müşteriler
+                        </a>
+                    </div>
+                    <div class="col-md-3">
+                        <a th:href="@{/customers/status/INACTIVE}" 
+                           th:class="${status == 'INACTIVE'} ? 'btn btn-warning w-100 mb-2' : 'btn btn-outline-warning w-100 mb-2'">
+                            <i class="bi bi-person-dash"></i> İnaktif Müşteriler
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Müşteri Listesi -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">
+                    Müşteri Listesi
+                    <span class="badge bg-secondary ms-2" th:text="${customers.size()}">0</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${customers.isEmpty()}" class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Bu durumda müşteri bulunamadı.
+                </div>
+                
+                <div th:if="${!customers.isEmpty()}">
+                    <table class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Ad</th>
+                                <th scope="col">Soyad</th>
+                                <th scope="col">E-posta</th>
+                                <th scope="col">Telefon</th>
+                                <th scope="col">Kayıt Tarihi</th>
+                                <th scope="col">İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="customer : ${customers}">
+                                <td th:text="${customer.id}">1</td>
+                                <td th:text="${customer.firstName}">John</td>
+                                <td th:text="${customer.lastName}">Doe</td>
+                                <td th:text="${customer.email}">john.doe@example.com</td>
+                                <td th:text="${customer.phone}">+905551234567</td>
+                                <td th:text="${#temporals.format(customer.registrationDate, 'dd/MM/yyyy')}">01/01/2023</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a th:href="@{/customers/{id}(id=${customer.id})}" class="btn btn-outline-info">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/customers/{id}/edit(id=${customer.id})}" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 

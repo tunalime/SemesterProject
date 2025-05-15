@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Müşteri Detayları')">
+    <meta charset="UTF-8">
+    <title>Müşteri Detayları</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('customers')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Müşteri Detayları</h1>
+            <div>
+                <a th:href="@{/customers}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Listeye Dön
+                </a>
+                <a th:href="@{/customers/{id}/edit(id=${customer.id})}" class="btn btn-primary">
+                    <i class="bi bi-pencil"></i> Düzenle
+                </a>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Temel Bilgiler</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Müşteri ID:</div>
+                            <div class="col-md-8" th:text="${customer.id}">1</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Ad:</div>
+                            <div class="col-md-8" th:text="${customer.firstName}">John</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Soyad:</div>
+                            <div class="col-md-8" th:text="${customer.lastName}">Doe</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">E-posta:</div>
+                            <div class="col-md-8" th:text="${customer.email}">john.doe@example.com</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Telefon:</div>
+                            <div class="col-md-8" th:text="${customer.phone}">+905551234567</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Adres:</div>
+                            <div class="col-md-8" th:text="${customer.address}">Istanbul, Turkey</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">Kayıt Tarihi:</div>
+                            <div class="col-md-8" th:text="${#temporals.format(customer.registrationDate, 'dd/MM/yyyy')}">01/01/2023</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">İletişim Tercihleri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">İletişim Tercihi:</div>
+                            <div class="col-md-8" th:text="${customer.contactPreference}">E-posta</div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-4 fw-bold">E-bülten Aboneliği:</div>
+                            <div class="col-md-8">
+                                <span th:if="${customer.newsletterSubscribed}" class="badge bg-success">Abone</span>
+                                <span th:unless="${customer.newsletterSubscribed}" class="badge bg-secondary">Abone Değil</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Müşteri Durumu</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2">Mevcut Durum:</div>
+                            <div>
+                                <span th:switch="${customer.status}">
+                                    <span th:case="'LEAD'" class="badge bg-primary">Potansiyel Müşteri</span>
+                                    <span th:case="'PROSPECT'" class="badge bg-info">Beklenen Müşteri</span>
+                                    <span th:case="'CUSTOMER'" class="badge bg-success">Aktif Müşteri</span>
+                                    <span th:case="'INACTIVE'" class="badge bg-warning">İnaktif Müşteri</span>
+                                    <span th:case="*" class="badge bg-secondary" th:text="${customer.status}">Diğer</span>
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <div class="fw-bold mb-2">Durum Güncelle:</div>
+                            <form th:action="@{/customers/{id}/status(id=${customer.id})}" method="post">
+                                <div class="input-group">
+                                    <select name="status" class="form-select">
+                                        <option th:each="status : ${T(dev.tunalime.SemesterProject.entity.CustomerStatus).values()}"
+                                                th:value="${status}"
+                                                th:text="${status}"
+                                                th:selected="${status == customer.status}">
+                                            LEAD
+                                        </option>
+                                    </select>
+                                    <button type="submit" class="btn btn-outline-primary">Güncelle</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">İşlemler</h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="@{/customers/{id}/delete(id=${customer.id})}" method="post" 
+                              onsubmit="return confirm('Bu müşteriyi silmek istediğinizden emin misiniz?');">
+                            <button type="submit" class="btn btn-danger w-100 mb-3">
+                                <i class="bi bi-trash"></i> Müşteriyi Sil
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 
