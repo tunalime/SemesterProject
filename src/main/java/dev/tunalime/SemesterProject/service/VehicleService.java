@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -183,7 +182,7 @@ public class VehicleService {
         Vehicle vehicle = vehicleRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Vehicle not found with ID: " + id));
         
-        VehicleStatus oldStatus = vehicle.getStatus();
+        //VehicleStatus oldStatus = vehicle.getStatus();
         vehicle.setStatus(newStatus);
         
         // Update stock item available quantity if necessary

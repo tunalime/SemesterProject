@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Service to initialize sample data for development and testing purposes
