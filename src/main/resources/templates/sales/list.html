@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Satışlar')">
+    <title>Satışlar</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('sales')"></nav>
+    
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Satışlar</h1>
+            <a th:href="@{/sales/initiate}" class="btn btn-primary">
+                <i class="bi bi-plus"></i> Yeni Satış Başlat
+            </a>
+        </div>
+        
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <!-- Status Filter -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Duruma Göre Filtrele</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/sales/filter}" method="get" class="d-flex align-items-center">
+                    <select name="status" class="form-select me-2">
+                        <option value="">Tüm Satışlar</option>
+                        <option th:each="stat : ${statuses}" 
+                                th:value="${stat}" 
+                                th:text="${stat}"
+                                th:selected="${currentFilter == stat}">
+                            INITIATED
+                        </option>
+                    </select>
+                    <button type="submit" class="btn btn-secondary">Filtrele</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Sales Table -->
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Satış Listesi</h5>
+            </div>
+            <div class="card-body p-0">
+                <div th:if="${#lists.isEmpty(sales)}" class="p-4 text-center">
+                    <p>Kayıtlı satış bulunamadı.</p>
+                </div>
+                <div th:unless="${#lists.isEmpty(sales)}" class="table-responsive">
+                    <table class="table table-hover table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Müşteri</th>
+                                <th>Araç</th>
+                                <th>Fiyat</th>
+                                <th>Tarih</th>
+                                <th>Durum</th>
+                                <th>İşlemler</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="sale : ${sales}">
+                                <td th:text="${sale.id}">1</td>
+                                <td>
+                                    <a th:href="@{/customers/{id}/details(id=${sale.customer.id})}" 
+                                       th:text="${sale.customer.firstName + ' ' + sale.customer.lastName}">
+                                        John Doe
+                                    </a>
+                                </td>
+                                <td>
+                                    <a th:href="@{/vehicles/{id}/details(id=${sale.vehicle.id})}" 
+                                       th:text="${sale.vehicle.brand + ' ' + sale.vehicle.model + ' (' + sale.vehicle.year + ')'}">
+                                        Toyota Corolla (2022)
+                                    </a>
+                                </td>
+                                <td th:text="${'₺' + #numbers.formatDecimal(sale.salePrice, 0, 'COMMA', 0, 'POINT')}">₺500,000</td>
+                                <td th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy')}">01/01/2023</td>
+                                <td>
+                                    <span class="badge rounded-pill text-bg-primary" th:if="${sale.status.name() == 'INITIATED'}" th:text="${sale.status}">INITIATED</span>
+                                    <span class="badge rounded-pill text-bg-info" th:if="${sale.status.name() == 'PENDING'}" th:text="${sale.status}">PENDING</span>
+                                    <span class="badge rounded-pill text-bg-success" th:if="${sale.status.name() == 'COMPLETED'}" th:text="${sale.status}">COMPLETED</span>
+                                    <span class="badge rounded-pill text-bg-danger" th:if="${sale.status.name() == 'CANCELLED'}" th:text="${sale.status}">CANCELLED</span>
+                                    <span class="badge rounded-pill text-bg-dark" th:if="${sale.status.name() == 'DELIVERED'}" th:text="${sale.status}">DELIVERED</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/sales/{id}/details(id=${sale.id})}" class="btn btn-sm btn-outline-primary">
+                                        Detaylar
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 
