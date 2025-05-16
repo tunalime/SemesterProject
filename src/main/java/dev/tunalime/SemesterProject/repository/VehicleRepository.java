@@ -22,6 +22,8 @@ public interface VehicleRepository extends JpaRepository<Vehicle, Long>, JpaSpec
     
     List<Vehicle> findByStatus(VehicleStatus status);
     
+    List<Vehicle> findByStatusIn(List<VehicleStatus> statuses);
+    
     List<Vehicle> findByBrandAndModel(String brand, String model);
     
     List<Vehicle> findByBrandAndModelAndYear(String brand, String model, Integer year);

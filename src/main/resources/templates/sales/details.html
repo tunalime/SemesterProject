@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Satış Detayları')">
+    <title>Satış Detayları</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('sales')"></nav>
+    
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Satış Detayları</h1>
+            <a th:href="@{/sales}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Listeye Dön
+            </a>
+        </div>
+        
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="row">
+            <!-- Sale Information -->
+            <div class="col-md-8">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Satış Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Satış ID</h6>
+                                <p th:text="${sale.id}">12345</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Satış Tarihi</h6>
+                                <p th:text="${#temporals.format(sale.saleDate, 'dd/MM/yyyy')}">01/01/2023</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Fiyat Bilgileri -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted border-bottom pb-2">Fiyat Bilgileri</h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Araç Liste Fiyatı</h6>
+                                <p th:text="${'₺' + #numbers.formatDecimal(sale.vehicle.price, 0, 'COMMA', 0, 'POINT')}">₺500,000</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">İndirim Tutarı</h6>
+                                <p th:text="${sale.discount != null && sale.discount > 0 ? ('₺' + #numbers.formatDecimal(sale.discount, 0, 'COMMA', 0, 'POINT')) : 'Yok'}">₺20,000</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Net Satış Fiyatı</h6>
+                                <p class="fw-bold fs-5 text-success" th:text="${'₺' + #numbers.formatDecimal(sale.salePrice, 0, 'COMMA', 0, 'POINT')}">₺480,000</p>
+                            </div>
+                            <div class="col-md-6" th:if="${sale.discount != null && sale.discount > 0}">
+                                <h6 class="text-muted">İndirim Oranı</h6>
+                                <p class="text-danger" th:text="${#numbers.formatDecimal(sale.discount * 100 / sale.vehicle.price, 1, 'COMMA', 2, 'POINT') + '%'}">4.00%</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Diğer Bilgiler -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-muted border-bottom pb-2">Diğer Bilgiler</h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Durum</h6>
+                                <p>
+                                    <span class="badge rounded-pill text-bg-primary" th:if="${sale.status.name() == 'INITIATED'}" th:text="${sale.status}">INITIATED</span>
+                                    <span class="badge rounded-pill text-bg-info" th:if="${sale.status.name() == 'PENDING'}" th:text="${sale.status}">PENDING</span>
+                                    <span class="badge rounded-pill text-bg-success" th:if="${sale.status.name() == 'COMPLETED'}" th:text="${sale.status}">COMPLETED</span>
+                                    <span class="badge rounded-pill text-bg-danger" th:if="${sale.status.name() == 'CANCELLED'}" th:text="${sale.status}">CANCELLED</span>
+                                    <span class="badge rounded-pill text-bg-dark" th:if="${sale.status.name() == 'DELIVERED'}" th:text="${sale.status}">DELIVERED</span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Ödeme Yöntemi</h6>
+                                <p th:text="${sale.paymentMethod}">CASH</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row" th:if="${sale.salesEmployeeName != null}">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Satış Görevlisi</h6>
+                                <p th:text="${sale.salesEmployeeName}">John Smith</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer Information -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Müşteri Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Müşteri Adı</h6>
+                                <p th:text="${sale.customer.firstName + ' ' + sale.customer.lastName}">John Doe</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">E-posta</h6>
+                                <p th:text="${sale.customer.email}">john@example.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Telefon</h6>
+                                <p th:text="${sale.customer.phone != null ? sale.customer.phone : 'Yok'}">+1234567890</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Adres</h6>
+                                <p th:text="${sale.customer.address != null ? sale.customer.address : 'Yok'}">123 Main St</p>
+                            </div>
+                        </div>
+                        
+                        <a th:href="@{/customers/{id}/details(id=${sale.customer.id})}" class="btn btn-sm btn-outline-primary">
+                            Müşteri Profilini Görüntüle
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Vehicle Information -->
+                <div class="card">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Araç Bilgileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Marka/Model</h6>
+                                <p th:text="${sale.vehicle.brand + ' ' + sale.vehicle.model}">Toyota Corolla</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Yıl</h6>
+                                <p th:text="${sale.vehicle.year}">2022</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Paket</h6>
+                                <p th:text="${sale.vehicle.packageType}">Premium</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted">Renk</h6>
+                                <p th:text="${sale.vehicle.color}">White</p>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <h6 class="text-muted">VIN</h6>
+                                <p th:text="${sale.vehicle.vin}">1HGCM82633A123456</p>
+                            </div>
+                        </div>
+                        
+                        <a th:href="@{/vehicles/{id}/details(id=${sale.vehicle.id})}" class="btn btn-sm btn-outline-primary">
+                            Araç Detaylarını Görüntüle
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Action Sidebar -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">İşlemler</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Complete Sale -->
+                        <div class="mb-3" th:if="${sale.status.name() == 'INITIATED' || sale.status.name() == 'PENDING'}">
+                            <h6>Satışı Tamamla</h6>
+                            <form th:action="@{/sales/{id}/complete(id=${sale.id})}" method="post">
+                                <div class="mb-3">
+                                    <label for="salesEmployeeName" class="form-label">Satış Görevlisi</label>
+                                    <input type="text" id="salesEmployeeName" name="salesEmployeeName" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Satışı Tamamla</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Cancel Sale -->
+                        <div class="mb-3" th:if="${sale.status.name() != 'COMPLETED' && sale.status.name() != 'DELIVERED' && sale.status.name() != 'CANCELLED'}">
+                            <h6>Satışı İptal Et</h6>
+                            <form th:action="@{/sales/{id}/cancel(id=${sale.id})}" method="post">
+                                <button type="submit" class="btn btn-danger w-100">Satışı İptal Et</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Mark as Delivered -->
+                        <div class="mb-3" th:if="${sale.status.name() == 'COMPLETED'}">
+                            <h6>Teslim Edildi Olarak İşaretle</h6>
+                            <form th:action="@{/sales/{id}/deliver(id=${sale.id})}" method="post">
+                                <button type="submit" class="btn btn-primary w-100">Teslim Edildi Olarak İşaretle</button>
+                            </form>
+                        </div>
+                        
+                        <!-- Update Payment Method -->
+                        <div class="mb-3" th:if="${sale.status.name() != 'CANCELLED'}">
+                            <h6>Ödeme Yöntemini Güncelle</h6>
+                            <form th:action="@{/sales/{id}/payment-method(id=${sale.id})}" method="post">
+                                <div class="mb-3">
+                                    <select name="paymentMethod" class="form-select" required>
+                                        <option value="">Ödeme Yöntemi Seçin</option>
+                                        <option th:each="method : ${paymentMethods}" 
+                                                th:value="${method}" 
+                                                th:text="${method}"
+                                                th:selected="${sale.paymentMethod == method}">
+                                            CASH
+                                        </option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-secondary w-100">Ödeme Yöntemini Güncelle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+</body>
+</html> 

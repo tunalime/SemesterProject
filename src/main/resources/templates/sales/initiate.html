@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Yeni Satış Başlat')">
+    <title>Yeni Satış Başlat</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('sales')"></nav>
+    
+    <div class="container py-4">
+        <div class="mb-4">
+            <h1>Yeni Satış Başlat</h1>
+            <p class="text-muted">Müşteri ve araç seçerek yeni bir satış başlatın.</p>
+        </div>
+        
+        <!-- Alert Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <span th:text="${success}">Success message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <span th:text="${error}">Error message</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Satış Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/sales/initiate}" method="post">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="customerId" class="form-label">Müşteri</label>
+                            <select id="customerId" name="customerId" class="form-select" required>
+                                <option value="">Müşteri Seçin</option>
+                                <option th:each="customer : ${customers}" 
+                                        th:value="${customer.id}" 
+                                        th:text="${customer.firstName + ' ' + customer.lastName + ' (' + customer.email + ')'}">
+                                    John Doe (john@example.com)
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicleId" class="form-label">Araç</label>
+                            <select id="vehicleId" name="vehicleId" class="form-select" required>
+                                <option value="">Araç Seçin</option>
+                                <option th:each="vehicle : ${vehicles}" 
+                                        th:value="${vehicle.id}" 
+                                        th:text="${vehicle.brand + ' ' + vehicle.model + ' (' + vehicle.year + ') - ' + vehicle.color + ' - ₺' + #numbers.formatDecimal(vehicle.price, 0, 'COMMA', 0, 'POINT')}">
+                                    Toyota Corolla (2022) - White - ₺500,000
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="salePrice" class="form-label">Satış Fiyatı (₺)</label>
+                            <input type="number" id="salePrice" name="salePrice" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="discount" class="form-label">İndirim Tutarı (₺) (Opsiyonel)</label>
+                            <input type="number" id="discount" name="discount" class="form-control" step="0.01" min="0">
+                        </div>
+                    </div>
+                    
+                    <!-- Fiyat özeti bilgisi -->
+                    <div class="row mb-4" id="price-summary" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card bg-light">
+                                <div class="card-body py-2">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Araç Liste Fiyatı:</small>
+                                            <p class="mb-0" id="original-price-display">₺0</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">İndirim:</small>
+                                            <p class="mb-0 text-danger" id="discount-display">₺0</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Net Satış Fiyatı:</small>
+                                            <p class="mb-0 fw-bold text-success" id="final-price-display">₺0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="form-label">Ödeme Yöntemi</label>
+                        <select id="paymentMethod" name="paymentMethod" class="form-select" required>
+                            <option value="">Ödeme Yöntemi Seçin</option>
+                            <option th:each="method : ${paymentMethods}" 
+                                    th:value="${method}" 
+                                    th:text="${method}">
+                                CASH
+                            </option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/sales}" class="btn btn-secondary">İptal</a>
+                        <button type="submit" class="btn btn-primary">Satış Başlat</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <script>
+        // Global değişkenler
+        let originalPrice = 0;
+        let vehicleId = null;
+        
+        // Fiyat bilgilerini formatla
+        function formatPrice(price) {
+            return '₺' + parseFloat(price).toLocaleString('tr-TR');
+        }
+        
+        // Fiyat özetini güncelle
+        function updatePriceSummary() {
+            const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            
+            // Eğer satış fiyatı veya indirim girdiyse özet göster
+            if (salePrice > 0 || discount > 0) {
+                document.getElementById('price-summary').style.display = 'block';
+                
+                // Orijinal fiyat, indirim ve nihai fiyatı göster
+                document.getElementById('original-price-display').innerText = formatPrice(originalPrice);
+                document.getElementById('discount-display').innerText = formatPrice(discount);
+                document.getElementById('final-price-display').innerText = formatPrice(salePrice);
+            } else {
+                document.getElementById('price-summary').style.display = 'none';
+            }
+        }
+        
+        // Araç seçildiğinde fiyatı ayarla
+        document.getElementById('vehicleId').addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (!selectedOption.value) {
+                originalPrice = 0;
+                document.getElementById('salePrice').value = '';
+                document.getElementById('discount').value = '';
+                document.getElementById('price-summary').style.display = 'none';
+                return;
+            }
+            
+            vehicleId = selectedOption.value;
+            const priceText = selectedOption.text.split('₺')[1];
+            
+            if (priceText) {
+                originalPrice = parseFloat(priceText.replace(/,/g, '').replace(/\./g, ''));
+                document.getElementById('salePrice').value = originalPrice;
+                updatePriceSummary();
+            }
+        });
+        
+        // İndirim girildiğinde satış fiyatını güncelle
+        document.getElementById('discount').addEventListener('input', function() {
+            const discount = parseFloat(this.value) || 0;
+            const newSalePrice = Math.max(0, originalPrice - discount);
+            document.getElementById('salePrice').value = newSalePrice;
+            updatePriceSummary();
+        });
+        
+        // Satış fiyatı değiştirildiğinde indirim miktarını güncelle
+        document.getElementById('salePrice').addEventListener('input', function() {
+            const salePrice = parseFloat(this.value) || 0;
+            const newDiscount = Math.max(0, originalPrice - salePrice);
+            document.getElementById('discount').value = newDiscount;
+            updatePriceSummary();
+        });
+    </script>
+</body>
+</html> 

@@ -28,6 +28,9 @@
                         <a class="nav-link" th:classappend="${activeTab == 'customers'} ? 'active' : ''" th:href="@{/customers}">Müşteriler</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" th:classappend="${activeTab == 'sales'} ? 'active' : ''" th:href="@{/sales}">Satışlar</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" th:classappend="${activeTab == 'forecasts'} ? 'active' : ''" th:href="@{/forecasts/generate}">Tahminleme</a>
                     </li>
                     <li class="nav-item">

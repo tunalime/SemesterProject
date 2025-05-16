@@ -123,6 +123,14 @@
                         <h5 class="mb-0">İşlemler</h5>
                     </div>
                     <div class="card-body">
+                        <div class="d-grid gap-2 mb-3">
+                            <a th:href="@{/sales/customer/{id}(id=${customer.id})}" class="btn btn-outline-primary">
+                                <i class="bi bi-receipt"></i> Satış Geçmişini Görüntüle
+                            </a>
+                            <a th:href="@{/sales/initiate}" class="btn btn-outline-success">
+                                <i class="bi bi-cash-coin"></i> Yeni Satış Başlat
+                            </a>
+                        </div>
                         <form th:action="@{/customers/{id}/delete(id=${customer.id})}" method="post" 
                               onsubmit="return confirm('Bu müşteriyi silmek istediğinizden emin misiniz?');">
                             <button type="submit" class="btn btn-danger w-100 mb-3">

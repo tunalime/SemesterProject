@@ -280,6 +280,19 @@ public class VehicleService {
     }
     
     /**
+     * Get vehicles by statuses
+     *
+     * @param statuses List of statuses
+     * @return List of vehicles matching the statuses
+     */
+    public List<VehicleDTO> getVehiclesByStatuses(List<VehicleStatus> statuses) {
+        List<Vehicle> vehicles = vehicleRepository.findByStatusIn(statuses);
+        return vehicles.stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+    
+    /**
      * Convert Vehicle entity to DTO
      * 
      * @param vehicle Vehicle entity

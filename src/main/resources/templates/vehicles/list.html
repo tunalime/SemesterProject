@@ -100,14 +100,9 @@
                                 </span>
                             </td>
                             <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a th:href="@{/vehicles/{id}(id=${vehicle.id})}" class="btn btn-outline-info">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a th:href="@{/vehicles/{id}/edit(id=${vehicle.id})}" class="btn btn-outline-primary">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                </div>
+                                <a th:href="@{/vehicles/{id}(id=${vehicle.id})}" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-eye"></i> Detaylar
+                                </a>
                             </td>
                         </tr>
                     </tbody>
