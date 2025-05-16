@@ -50,8 +50,4 @@ public class SalesForecast {
     // The creation date of the forecast
     @Column(nullable = false)
     private LocalDate creationDate;
-    
-    // Notes or explanations for the forecast
-    @Column(columnDefinition = "TEXT")
-    private String notes;
 } 

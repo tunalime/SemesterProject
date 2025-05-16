@@ -79,7 +79,6 @@ public class ForecastService {
         forecast.setForecastedQuantity(forecastedQuantity);
         forecast.setNumberOfPeriods(numberOfPeriods);
         forecast.setCreationDate(currentDate);
-        forecast.setNotes("Forecast generated using " + numberOfPeriods + "-period Moving Average method");
         
         return salesForecastRepository.save(forecast);
     }
