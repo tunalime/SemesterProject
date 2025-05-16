@@ -19,65 +19,6 @@
             </div>
         </div>
         
-        <!-- Filtreleme Formu -->
-        <div class="card mb-4">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">Müşteri Arama</h5>
-            </div>
-            <div class="card-body">
-                <form th:action="@{/customers/search}" method="get" class="row g-3">
-                    <div class="col-md-5">
-                        <label for="firstName" class="form-label">Ad</label>
-                        <input type="text" class="form-control" id="firstName" name="firstName">
-                    </div>
-                    <div class="col-md-5">
-                        <label for="lastName" class="form-label">Soyad</label>
-                        <input type="text" class="form-control" id="lastName" name="lastName">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-success w-100">
-                            <i class="bi bi-search"></i> Ara
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        
-        <!-- Fırsat Segmentleri -->
-        <div class="row mb-4">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Hızlı Filtreler</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <a th:href="@{/customers/status/LEAD}" class="btn btn-outline-primary w-100 mb-2">
-                                    <i class="bi bi-people"></i> Potansiyel Müşteriler
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a th:href="@{/customers/status/PROSPECT}" class="btn btn-outline-info w-100 mb-2">
-                                    <i class="bi bi-person-check"></i> Beklenen Müşteriler
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a th:href="@{/customers/with-purchases}" class="btn btn-outline-success w-100 mb-2">
-                                    <i class="bi bi-cart-check"></i> Satın Alan Müşteriler
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                                <a th:href="@{/customers/repeat-customers}" class="btn btn-outline-warning w-100 mb-2">
-                                    <i class="bi bi-stars"></i> Tekrar Eden Müşteriler
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Müşteri Listesi -->
         <div class="card">
             <div class="card-body p-0">
