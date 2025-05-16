@@ -191,8 +191,36 @@ public class SampleDataInitializer {
                     String packageType = packageTypes[random.nextInt(packageTypes.length)];
                     Integer year = years[random.nextInt(years.length)];
                     
-                    // Base price (in Turkish Lira)
-                    BigDecimal basePrice = BigDecimal.valueOf(300000 + random.nextInt(700000));
+                    // Yıla ve markaya göre daha gerçekçi fiyat belirle (Türk Lirası cinsinden)
+                    BigDecimal basePrice;
+                    
+                    // Luxury markaları daha yüksek fiyatla
+                    boolean isLuxuryBrand = brand.equals("Volkswagen") || brand.equals("Toyota") || brand.equals("Honda");
+                    
+                    if (isLuxuryBrand) {
+                        // Lüks markalar için fiyat aralığı (1,000,000 - 3,000,000 TL)
+                        basePrice = BigDecimal.valueOf(1000000 + random.nextInt(2000000));
+                    } else {
+                        // Standart markalar için fiyat aralığı (500,000 - 1,500,000 TL)
+                        basePrice = BigDecimal.valueOf(500000 + random.nextInt(1000000));
+                    }
+                    
+                    // Yıla göre fiyat düzeltmesi
+                    // Daha eski modeller için indirim
+                    int currentYear = LocalDate.now().getYear();
+                    int yearDiff = currentYear - year;
+                    if (yearDiff > 0) {
+                        // Her yıl için %8 değer kaybı
+                        double depreciationFactor = Math.pow(0.92, yearDiff);
+                        basePrice = basePrice.multiply(BigDecimal.valueOf(depreciationFactor));
+                    }
+                    
+                    // Paket tipine göre fiyat ayarlaması
+                    if (packageType.equals("Premium") || packageType.equals("Luxury")) {
+                        basePrice = basePrice.multiply(BigDecimal.valueOf(1.15)); // %15 premium
+                    } else if (packageType.equals("Sport")) {
+                        basePrice = basePrice.multiply(BigDecimal.valueOf(1.10)); // %10 premium
+                    }
                     
                     // Total quantity of this model in stock (will create this many vehicles)
                     int totalQuantity = 2 + random.nextInt(5); // 2-6 vehicles per stock item type
@@ -241,17 +269,24 @@ public class SampleDataInitializer {
                 // Stock entry date (when the vehicle arrived at the dealership)
                 LocalDate stockEntryDate = LocalDate.now().minusMonths(random.nextInt(12));
                 
-                // Vehicle status (most new cars are available, some may be in different states)
-                int statusRandom = random.nextInt(10);
+                // Vehicle status distribution:
+                // 45% IN_SHOWROOM
+                // 35% IN_STOCK
+                // 10% RESERVED
+                // 5% UNDER_MAINTENANCE
+                // 5% already SOLD (some historical vehicles)
+                int statusRandom = random.nextInt(100);
                 VehicleStatus status;
-                if (statusRandom < 6) {
-                    status = VehicleStatus.IN_SHOWROOM; // 60% in showroom
-                } else if (statusRandom < 8) {
-                    status = VehicleStatus.RESERVED; // 20% reserved
-                } else if (statusRandom < 9) {
-                    status = VehicleStatus.SOLD; // 10% sold
+                if (statusRandom < 45) {
+                    status = VehicleStatus.IN_SHOWROOM; // 45% in showroom
+                } else if (statusRandom < 80) {
+                    status = VehicleStatus.IN_STOCK; // 35% in stock
+                } else if (statusRandom < 90) {
+                    status = VehicleStatus.RESERVED; // 10% reserved
+                } else if (statusRandom < 95) {
+                    status = VehicleStatus.UNDER_MAINTENANCE; // 5% in maintenance
                 } else {
-                    status = VehicleStatus.UNDER_MAINTENANCE; // 10% in maintenance
+                    status = VehicleStatus.SOLD; // 5% already sold
                 }
                 
                 // Description
@@ -311,7 +346,13 @@ public class SampleDataInitializer {
         
         // Create a distribution pattern - more sales in summer months and December
         // and increasing trend over time
-        int totalSalesToCreate = Math.min(availableVehicles.size(), 200); // Cap at 200 or available vehicles
+        
+        // Limit the number of sales to create to around 25-30% of available vehicles
+        // This ensures we don't convert too many vehicles to SOLD status
+        int maxSales = (int)(availableVehicles.size() * 0.3);
+        int totalSalesToCreate = Math.min(maxSales, 100); // Cap at 100 or 30% of available
+        
+        logger.info("Creating {} sales out of {} available vehicles", totalSalesToCreate, availableVehicles.size());
         
         for (int i = 0; i < totalSalesToCreate; i++) {
             // Select a customer randomly
@@ -352,10 +393,41 @@ public class SampleDataInitializer {
             BigDecimal salePrice = vehicle.getPrice();
             BigDecimal discount = BigDecimal.ZERO;
             
-            // Some sales have discounts
-            if (random.nextBoolean()) {
-                discount = vehicle.getPrice().multiply(BigDecimal.valueOf(0.01 * (random.nextInt(10) + 1))); // 1-10% discount
-                salePrice = vehicle.getPrice().subtract(discount);
+            // Indirim stratejisi:
+            // 1. Araba yaşı: Daha yaşlı araçlarda indirim olasılığı daha yüksek
+            // 2. Mevsimsellik: Yılın belirli dönemlerinde kampanyalar
+            // 3. Rastgele faktör: Bazı müşteriler pazarlık yapabilir
+            
+            boolean shouldApplyDiscount = false;
+            double discountPercentage = 0;
+            
+            // 1. Araba yaşı bazlı indirim
+            int vehicleAge = LocalDate.now().getYear() - vehicle.getYear();
+            if (vehicleAge > 0) {
+                // Her yıl için indirim olasılığı artıyor
+                shouldApplyDiscount = shouldApplyDiscount || random.nextDouble() < (0.2 * vehicleAge);
+                discountPercentage += vehicleAge * 0.5; // Her yıl için %0.5 ek indirim
+            }
+            
+            // 2. Mevsimsel indirim
+            if (month == Month.JANUARY || month == Month.FEBRUARY || // Kış aylarında satışları artırmak için
+                month == Month.AUGUST) { // Ağustos sonu sezon sonu
+                shouldApplyDiscount = shouldApplyDiscount || random.nextDouble() < 0.4;
+                discountPercentage += 2; // Ek %2 indirim
+            }
+            
+            // 3. Rastgele müşteri pazarlık faktörü
+            if (random.nextDouble() < 0.3) { // %30 olasılıkla
+                shouldApplyDiscount = true;
+                discountPercentage += random.nextDouble() * 3; // %0-3 arası ek indirim
+            }
+            
+            // Toplam indirim yüzdesini sınırla (maksimum %15)
+            discountPercentage = Math.min(15, discountPercentage);
+            
+            if (shouldApplyDiscount && discountPercentage > 0) {
+                discount = salePrice.multiply(BigDecimal.valueOf(discountPercentage / 100));
+                salePrice = salePrice.subtract(discount);
             }
             
             // Select payment method

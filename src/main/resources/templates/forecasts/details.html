@@ -75,20 +75,6 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Notlar</h5>
-                    </div>
-                    <div class="card-body">
-                        <p th:if="${forecast.notes != null && forecast.notes != ''}" th:text="${forecast.notes}">
-                            Bu tahmin son 6 aylık satış verilerine dayanarak yapılmıştır.
-                        </p>
-                        <p th:unless="${forecast.notes != null && forecast.notes != ''}" class="text-muted">
-                            Bu tahmin için not bulunmamaktadır.
-                        </p>
-                    </div>
-                </div>
             </div>
             
             <div class="col-md-4">

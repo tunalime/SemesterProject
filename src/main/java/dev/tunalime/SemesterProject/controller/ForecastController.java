@@ -134,8 +134,7 @@ public class ForecastController {
                 forecast.getForecastedQuantity(),
                 forecast.getActualQuantity(),
                 forecast.getNumberOfPeriods(),
-                forecast.getCreationDate(),
-                forecast.getNotes()
+                forecast.getCreationDate()
         );
     }
 } 
