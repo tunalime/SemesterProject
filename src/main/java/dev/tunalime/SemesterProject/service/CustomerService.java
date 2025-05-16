@@ -2,7 +2,6 @@ package dev.tunalime.SemesterProject.service;
 
 import dev.tunalime.SemesterProject.dto.CustomerDTO;
 import dev.tunalime.SemesterProject.entity.Customer;
-import dev.tunalime.SemesterProject.entity.CustomerStatus;
 import dev.tunalime.SemesterProject.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -81,7 +80,6 @@ public class CustomerService {
         customer.setPhone(customerDTO.getPhone());
         customer.setAddress(customerDTO.getAddress());
         customer.setRegistrationDate(LocalDate.now());
-        customer.setStatus(CustomerStatus.LEAD); // Default status for new customers
         
         customer = customerRepository.save(customer);
         
@@ -112,25 +110,7 @@ public class CustomerService {
         customer.setEmail(customerDTO.getEmail());
         customer.setPhone(customerDTO.getPhone());
         customer.setAddress(customerDTO.getAddress());
-        customer.setStatus(customerDTO.getStatus());
         
-        customer = customerRepository.save(customer);
-        
-        return convertToDTO(customer);
-    }
-    
-    /**
-     * Update customer status
-     * 
-     * @param id Customer ID
-     * @param status New status
-     * @return Updated customer
-     */
-    public CustomerDTO updateCustomerStatus(Long id, CustomerStatus status) {
-        Customer customer = customerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found with ID: " + id));
-        
-        customer.setStatus(status);
         customer = customerRepository.save(customer);
         
         return convertToDTO(customer);
@@ -179,18 +159,6 @@ public class CustomerService {
     }
     
     /**
-     * Get customers by status
-     * 
-     * @param status Customer status
-     * @return List of customers with the specified status
-     */
-    public List<CustomerDTO> getCustomersByStatus(CustomerStatus status) {
-        return customerRepository.findByStatus(status).stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
-    
-    /**
      * Get customers who have made purchases
      * 
      * @return List of customers who have made purchases
@@ -232,11 +200,10 @@ public class CustomerService {
      * @param lastName Last name (optional)
      * @param email Email (optional)
      * @param phone Phone (optional)
-     * @param status Status (optional)
      * @return List of matching customers
      */
     public List<CustomerDTO> advancedSearch(String firstName, String lastName, String email, 
-                                           String phone, CustomerStatus status) {
+                                           String phone) {
         List<Customer> customers = customerRepository.findAll((root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             
@@ -249,15 +216,11 @@ public class CustomerService {
             }
             
             if (email != null && !email.trim().isEmpty()) {
-                predicates.add(cb.like(root.get("email"), "%" + email + "%"));
+                predicates.add(cb.equal(root.get("email"), email));
             }
             
             if (phone != null && !phone.trim().isEmpty()) {
-                predicates.add(cb.like(root.get("phone"), "%" + phone + "%"));
-            }
-            
-            if (status != null) {
-                predicates.add(cb.equal(root.get("status"), status));
+                predicates.add(cb.equal(root.get("phone"), phone));
             }
             
             return predicates.isEmpty() ? null : cb.and(predicates.toArray(new Predicate[0]));
@@ -283,8 +246,6 @@ public class CustomerService {
         dto.setPhone(customer.getPhone());
         dto.setAddress(customer.getAddress());
         dto.setRegistrationDate(customer.getRegistrationDate());
-        dto.setStatus(customer.getStatus());
-        
         return dto;
     }
 } 

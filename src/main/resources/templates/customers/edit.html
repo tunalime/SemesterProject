@@ -71,30 +71,19 @@
                     
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="status" class="form-label">Durum <span class="text-danger">*</span></label>
-                            <select class="form-select" id="status" th:field="*{status}" required>
-                                <option th:each="status : ${statuses}" 
-                                        th:value="${status}" 
-                                        th:text="${status}"
-                                        th:selected="${status == customer.status}">LEAD</option>
-                            </select>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">
-                                Lütfen bir durum seçiniz.
+                            <label for="birthDate" class="form-label">Doğum Tarihi</label>
+                            <input type="date" class="form-control" id="birthDate" th:field="*{birthDate}">
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('birthDate')}" th:errors="*{birthDate}">
+                                Lütfen geçerli bir doğum tarihi giriniz.
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label for="contactPreference" class="form-label">İletişim Tercihi</label>
-                            <select class="form-select" id="contactPreference" th:field="*{contactPreference}">
-                                <option value="E-posta">E-posta</option>
-                                <option value="Telefon">Telefon</option>
-                                <option value="SMS">SMS</option>
-                            </select>
+                            <label for="notes" class="form-label">Notlar</label>
+                            <textarea class="form-control" id="notes" th:field="*{notes}" rows="3"></textarea>
+                            <div class="invalid-feedback" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}">
+                                Lütfen geçerli bir not giriniz.
+                            </div>
                         </div>
-                    </div>
-                    
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="newsletterSubscribed" th:field="*{newsletterSubscribed}">
-                        <label class="form-check-label" for="newsletterSubscribed">E-bülten aboneliğini onayla</label>
                     </div>
                     
                     <div class="d-grid gap-2">

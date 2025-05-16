@@ -39,9 +39,6 @@ public class Customer {
     @Column(nullable = false)
     private LocalDate registrationDate;
     
-    @Column(nullable = false)
-    private CustomerStatus status;
-    
     // A customer can have many interactions
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CustomerInteraction> interactions = new ArrayList<>();

@@ -1,7 +1,6 @@
 package dev.tunalime.SemesterProject.controller;
 
 import dev.tunalime.SemesterProject.dto.CustomerDTO;
-import dev.tunalime.SemesterProject.entity.CustomerStatus;
 import dev.tunalime.SemesterProject.service.CustomerService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +55,6 @@ public class CustomerController {
     @GetMapping("/add")
     public String showAddCustomerForm(Model model) {
         model.addAttribute("customer", new CustomerDTO());
-        model.addAttribute("statuses", CustomerStatus.values());
         return "customers/add";
     }
     
@@ -87,7 +85,6 @@ public class CustomerController {
     public String showEditCustomerForm(@PathVariable Long id, Model model) {
         CustomerDTO customer = customerService.getCustomerById(id);
         model.addAttribute("customer", customer);
-        model.addAttribute("statuses", CustomerStatus.values());
         return "customers/edit";
     }
     
@@ -109,22 +106,6 @@ public class CustomerController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error updating customer: " + e.getMessage());
             return "redirect:/customers/" + id + "/edit";
         }
-    }
-    
-    /**
-     * Update customer status
-     */
-    @PostMapping("/{id}/status")
-    public String updateCustomerStatus(@PathVariable Long id, @RequestParam CustomerStatus status,
-                                     RedirectAttributes redirectAttributes) {
-        try {
-            customerService.updateCustomerStatus(id, status);
-            redirectAttributes.addFlashAttribute("successMessage", "Customer status updated successfully");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error updating customer status: " + e.getMessage());
-        }
-        
-        return "redirect:/customers/" + id;
     }
     
     /**
@@ -179,10 +160,9 @@ public class CustomerController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String phone,
-            @RequestParam(required = false) CustomerStatus status) {
+            @RequestParam(required = false) String phone) {
         
-        List<CustomerDTO> customers = customerService.advancedSearch(firstName, lastName, email, phone, status);
+        List<CustomerDTO> customers = customerService.advancedSearch(firstName, lastName, email, phone);
         return new ResponseEntity<>(customers, HttpStatus.OK);
     }
 } 

@@ -34,7 +34,6 @@
                             <th>E-posta</th>
                             <th>Telefon</th>
                             <th>Kayıt Tarihi</th>
-                            <th>Durum</th>
                             <th>İşlemler</th>
                         </tr>
                     </thead>
@@ -45,16 +44,6 @@
                             <td th:text="${customer.email}">ahmet@example.com</td>
                             <td th:text="${customer.phone}">+90 555 123 4567</td>
                             <td th:text="${#temporals.format(customer.registrationDate, 'dd/MM/yyyy')}">01/01/2023</td>
-                            <td>
-                                <span th:class="${'badge rounded-pill ' + 
-                                     (customer.status == T(dev.tunalime.SemesterProject.entity.CustomerStatus).LEAD ? 'bg-primary' : 
-                                      customer.status == T(dev.tunalime.SemesterProject.entity.CustomerStatus).PROSPECT ? 'bg-info' : 
-                                      customer.status == T(dev.tunalime.SemesterProject.entity.CustomerStatus).ACTIVE ? 'bg-success' :
-                                      customer.status == T(dev.tunalime.SemesterProject.entity.CustomerStatus).REPEAT ? 'bg-warning' : 'bg-secondary')}" 
-                                     th:text="${customer.status}">
-                                    LEAD
-                                </span>
-                            </td>
                             <td>
                                 <div class="btn-group btn-group-sm">
                                     <a th:href="@{/customers/{id}(id=${customer.id})}" class="btn btn-outline-info">

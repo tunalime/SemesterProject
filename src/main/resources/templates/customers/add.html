@@ -91,26 +91,11 @@
                         </div>
                     </div>
                     
-                    <div class="row mb-3">
-                        <div class="col-md-6">
-                            <label for="status" class="form-label">Durum <span class="text-danger">*</span></label>
-                            <select class="form-select" id="status" th:field="*{status}" required>
-                                <option value="" selected disabled>Durum seçiniz</option>
-                                <option th:each="status : ${statuses}" 
-                                        th:value="${status}" 
-                                        th:text="${status}">LEAD</option>
-                            </select>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('status')}" th:errors="*{status}">
-                                Lütfen bir durum seçiniz.
-                            </div>
-                            <div class="invalid-feedback">Lütfen bir durum seçiniz.</div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="notes" class="form-label">Notlar</label>
-                            <textarea class="form-control" id="notes" th:field="*{notes}" rows="3"></textarea>
-                            <div class="invalid-feedback" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}">
-                                Lütfen geçerli bir not giriniz.
-                            </div>
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notlar</label>
+                        <textarea class="form-control" id="notes" th:field="*{notes}" rows="3"></textarea>
+                        <div class="invalid-feedback" th:if="${#fields.hasErrors('notes')}" th:errors="*{notes}">
+                            Lütfen geçerli bir not giriniz.
                         </div>
                     </div>
                     

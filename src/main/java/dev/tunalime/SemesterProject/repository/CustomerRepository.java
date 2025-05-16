@@ -1,7 +1,6 @@
 package dev.tunalime.SemesterProject.repository;
 
 import dev.tunalime.SemesterProject.entity.Customer;
-import dev.tunalime.SemesterProject.entity.CustomerStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,8 +18,6 @@ public interface CustomerRepository extends JpaRepository<Customer, Long>, JpaSp
     List<Customer> findByLastName(String lastName);
     
     List<Customer> findByFirstNameAndLastName(String firstName, String lastName);
-    
-    List<Customer> findByStatus(CustomerStatus status);
     
     List<Customer> findByRegistrationDateBetween(LocalDate startDate, LocalDate endDate);
     

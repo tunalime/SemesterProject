@@ -83,43 +83,6 @@
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-header bg-light">
-                        <h5 class="mb-0">Müşteri Durumu</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <div class="fw-bold mb-2">Mevcut Durum:</div>
-                            <div>
-                                <span th:switch="${customer.status}">
-                                    <span th:case="'LEAD'" class="badge bg-primary">Potansiyel Müşteri</span>
-                                    <span th:case="'PROSPECT'" class="badge bg-info">Beklenen Müşteri</span>
-                                    <span th:case="'CUSTOMER'" class="badge bg-success">Aktif Müşteri</span>
-                                    <span th:case="'INACTIVE'" class="badge bg-warning">İnaktif Müşteri</span>
-                                    <span th:case="*" class="badge bg-secondary" th:text="${customer.status}">Diğer</span>
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="fw-bold mb-2">Durum Güncelle:</div>
-                            <form th:action="@{/customers/{id}/status(id=${customer.id})}" method="post">
-                                <div class="input-group">
-                                    <select name="status" class="form-select">
-                                        <option th:each="status : ${T(dev.tunalime.SemesterProject.entity.CustomerStatus).values()}"
-                                                th:value="${status}"
-                                                th:text="${status}"
-                                                th:selected="${status == customer.status}">
-                                            LEAD
-                                        </option>
-                                    </select>
-                                    <button type="submit" class="btn btn-outline-primary">Güncelle</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
                         <h5 class="mb-0">İşlemler</h5>
                     </div>
                     <div class="card-body">

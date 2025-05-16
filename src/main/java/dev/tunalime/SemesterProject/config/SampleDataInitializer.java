@@ -144,9 +144,6 @@ public class SampleDataInitializer {
             // Random registration date between start and end dates
             LocalDate registrationDate = startDate.plusDays(random.nextInt((int) daysBetween));
             
-            // Random customer status
-            CustomerStatus status = CustomerStatus.values()[random.nextInt(CustomerStatus.values().length)];
-            
             Customer customer = new Customer();
             customer.setFirstName(firstName);
             customer.setLastName(lastName);
@@ -154,7 +151,6 @@ public class SampleDataInitializer {
             customer.setPhone(phone);
             customer.setAddress(city + ", Türkiye");
             customer.setRegistrationDate(registrationDate);
-            customer.setStatus(status);
             
             customers.add(customer);
         }

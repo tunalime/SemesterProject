@@ -1,6 +1,5 @@
 package dev.tunalime.SemesterProject.dto;
 
-import dev.tunalime.SemesterProject.entity.CustomerStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,6 +21,5 @@ public class CustomerDTO {
     private String address;
     private LocalDate birthDate;
     private LocalDate registrationDate;
-    private CustomerStatus status;
     private String notes;
 } 
