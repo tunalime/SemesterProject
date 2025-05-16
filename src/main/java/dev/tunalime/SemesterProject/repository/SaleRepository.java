@@ -55,6 +55,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
     List<Object[]> countSalesByMonthForYear(Integer year);
     
     // Get sales data for moving average calculation
+    @Query("SELECT COUNT(s) FROM Sale s WHERE s.vehicle.brand = ?1 AND s.vehicle.model = ?2 AND s.vehicle.packageType = ?3 AND s.vehicle.year = ?4 AND s.saleDate BETWEEN ?5 AND ?6")
+    Long countSalesForPeriod(String brand, String model, String packageType, Integer year, LocalDate startDate, LocalDate endDate);
+    
+    // Get sales data for moving average calculation without year parameter for more flexible querying
     @Query("SELECT COUNT(s) FROM Sale s WHERE s.vehicle.brand = ?1 AND s.vehicle.model = ?2 AND s.vehicle.packageType = ?3 AND s.saleDate BETWEEN ?4 AND ?5")
-    Long countSalesForPeriod(String brand, String model, String packageType, LocalDate startDate, LocalDate endDate);
+    Long countSalesForPeriodFlexible(String brand, String model, String packageType, LocalDate startDate, LocalDate endDate);
 } 

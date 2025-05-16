@@ -101,16 +101,21 @@ public class SampleDataInitializer {
         // Turkish first names and last names for sample data
         String[] firstNames = {
             "Ahmet", "Mehmet", "Ali", "Mustafa", "Hüseyin", "Hasan", "İbrahim", "Murat", "Ömer", "Yusuf",
-            "Ayşe", "Fatma", "Emine", "Hatice", "Zeynep", "Elif", "Meryem", "Özlem", "Zehra", "Esra"
+            "Ayşe", "Fatma", "Emine", "Hatice", "Zeynep", "Elif", "Meryem", "Özlem", "Zehra", "Esra",
+            "Can", "Emre", "Kemal", "Serkan", "Burak", "Cem", "Deniz", "Gökhan", "Tolga", "Volkan",
+            "Selin", "Gamze", "Derya", "Pınar", "Ebru", "Gizem", "Merve", "Tuğba", "Burcu", "Canan"
         };
         
         String[] lastNames = {
             "Yılmaz", "Kaya", "Demir", "Çelik", "Şahin", "Yıldız", "Yıldırım", "Öztürk", "Aydın", "Özdemir",
-            "Arslan", "Doğan", "Kılıç", "Aslan", "Çetin", "Koç", "Kurt", "Özkan", "Şimşek", "Tekin"
+            "Arslan", "Doğan", "Kılıç", "Aslan", "Çetin", "Koç", "Kurt", "Özkan", "Şimşek", "Tekin",
+            "Kara", "Acar", "Altun", "Bulut", "Taş", "Aksoy", "Kaplan", "Yalçın", "Polat", "Şen",
+            "Genç", "Aktaş", "Ateş", "Korkmaz", "Alp", "Tunç", "Yıldız", "Öz", "Bakır", "Çalışkan"
         };
         
         String[] cities = {
-            "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Şanlıurfa", "Kocaeli"
+            "İstanbul", "Ankara", "İzmir", "Bursa", "Antalya", "Adana", "Konya", "Gaziantep", "Şanlıurfa", "Kocaeli",
+            "Mersin", "Diyarbakır", "Hatay", "Manisa", "Kayseri", "Samsun", "Balıkesir", "Kahramanmaraş", "Van", "Aydın"
         };
         
         String[] emailDomains = {
@@ -121,12 +126,29 @@ public class SampleDataInitializer {
         LocalDate endDate = LocalDate.now();
         long daysBetween = ChronoUnit.DAYS.between(startDate, endDate);
         
-        // Create at least 20 customers
-        for (int i = 0; i < 25; i++) {
+        // Set containing email addresses to ensure uniqueness
+        Set<String> usedEmails = new HashSet<>();
+        
+        // Create at least 50 customers (increased from 25)
+        for (int i = 0; i < 50; i++) {
             String firstName = firstNames[random.nextInt(firstNames.length)];
             String lastName = lastNames[random.nextInt(lastNames.length)];
             String city = cities[random.nextInt(cities.length)];
             String emailDomain = emailDomains[random.nextInt(emailDomains.length)];
+            
+            // Generate a unique email address for each customer
+            String baseEmail = firstName.toLowerCase() + "." + lastName.toLowerCase();
+            String email = baseEmail + "@" + emailDomain;
+            
+            // If the email is already used, add a unique identifier
+            int uniqueSuffix = 1;
+            while (usedEmails.contains(email)) {
+                email = baseEmail + uniqueSuffix + "@" + emailDomain;
+                uniqueSuffix++;
+            }
+            
+            // Add the email to the used set
+            usedEmails.add(email);
             
             // Turkish phone number format
             String phone = String.format("+90%d%d%d%d%d%d%d%d%d%d",
@@ -150,7 +172,7 @@ public class SampleDataInitializer {
             Customer customer = new Customer();
             customer.setFirstName(firstName);
             customer.setLastName(lastName);
-            customer.setEmail(firstName.toLowerCase() + "." + lastName.toLowerCase() + "@" + emailDomain);
+            customer.setEmail(email);
             customer.setPhone(phone);
             customer.setAddress(city + ", Türkiye");
             customer.setRegistrationDate(registrationDate);
@@ -187,7 +209,7 @@ public class SampleDataInitializer {
             List<String> models = entry.getValue();
             
             for (String model : models) {
-                for (int i = 0; i < 1 + random.nextInt(2); i++) { // 1-2 package types per model
+                for (int i = 0; i < 2 + random.nextInt(3); i++) { // 2-4 package types per model (increased from 1-2)
                     String packageType = packageTypes[random.nextInt(packageTypes.length)];
                     Integer year = years[random.nextInt(years.length)];
                     
@@ -223,7 +245,7 @@ public class SampleDataInitializer {
                     }
                     
                     // Total quantity of this model in stock (will create this many vehicles)
-                    int totalQuantity = 2 + random.nextInt(5); // 2-6 vehicles per stock item type
+                    int totalQuantity = 4 + random.nextInt(6); // 4-9 vehicles per stock item type (increased from 2-6)
                     
                     StockItem stockItem = new StockItem();
                     stockItem.setBrand(brand);
@@ -347,10 +369,10 @@ public class SampleDataInitializer {
         // Create a distribution pattern - more sales in summer months and December
         // and increasing trend over time
         
-        // Limit the number of sales to create to around 25-30% of available vehicles
+        // Limit the number of sales to create to around 50% of available vehicles (increased from 30%)
         // This ensures we don't convert too many vehicles to SOLD status
-        int maxSales = (int)(availableVehicles.size() * 0.3);
-        int totalSalesToCreate = Math.min(maxSales, 100); // Cap at 100 or 30% of available
+        int maxSales = (int)(availableVehicles.size() * 0.5);
+        int totalSalesToCreate = Math.min(maxSales, 250); // Cap at 250 or 50% of available (increased from 100)
         
         logger.info("Creating {} sales out of {} available vehicles", totalSalesToCreate, availableVehicles.size());
         

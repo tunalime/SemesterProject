@@ -19,6 +19,18 @@
             </div>
         </div>
         
+        <!-- Chart for historical data and forecast -->
+        <div class="card mb-4">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Satış Verileri ve Tahmin</h5>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height:300px;">
+                    <canvas id="salesForecastChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
         <div class="row">
             <div class="col-md-8">
                 <div class="card mb-4">
@@ -62,7 +74,9 @@
                             <div class="col-md-4 fw-bold">Gerçekleşen Miktar:</div>
                             <div class="col-md-8">
                                 <span th:if="${forecast.actualQuantity != null}" th:text="${forecast.actualQuantity}">3</span>
-                                <span th:unless="${forecast.actualQuantity != null}" class="text-muted">Henüz girilmedi</span>
+                                <span th:unless="${forecast.actualQuantity != null}" class="text-muted">
+                                    <i class="bi bi-info-circle"></i> Tahmin dönemi henüz sona ermedi. Dönem sonunda otomatik hesaplanacak.
+                                </span>
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -72,6 +86,34 @@
                         <div class="row mb-3">
                             <div class="col-md-4 fw-bold">Oluşturulma Tarihi:</div>
                             <div class="col-md-8" th:text="${#temporals.format(forecast.creationDate, 'dd/MM/yyyy HH:mm')}">01/01/2023 14:30</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Historical data table -->
+                <div class="card mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Geçmiş Satış Verileri</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Dönem</th>
+                                        <th>Satış Adedi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="sale : ${historicalSales}">
+                                        <td th:text="${sale[0]}">2023-01</td>
+                                        <td th:text="${sale[1]}">3</td>
+                                    </tr>
+                                    <tr th:if="${historicalSales.isEmpty()}">
+                                        <td colspan="2" class="text-center">Geçmiş satış verisi bulunamadı</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -87,7 +129,7 @@
                             <div class="mb-3">
                                 <div class="fw-bold mb-2">Doğruluk Oranı:</div>
                                 <div th:if="${forecast.forecastedQuantity != null && forecast.forecastedQuantity > 0}"
-                                     th:with="accuracy=${(forecast.actualQuantity / forecast.forecastedQuantity) * 100}">
+                                     th:with="accuracy=${forecast.accuracy != null ? forecast.accuracy : 0}">
                                     <div class="progress">
                                         <div class="progress-bar" 
                                              th:classappend="${accuracy >= 90} ? 'bg-success' : (${accuracy >= 70} ? 'bg-info' : 'bg-warning')"
@@ -104,7 +146,7 @@
                             
                             <div class="mb-3">
                                 <div class="fw-bold mb-2">Sapma:</div>
-                                <div th:if="${forecast.forecastedQuantity != null}"
+                                <div th:if="${forecast.forecastedQuantity != null && forecast.actualQuantity != null}"
                                      th:with="deviation=${forecast.forecastedQuantity - forecast.actualQuantity}">
                                     <span th:if="${deviation > 0}" class="text-danger">
                                         <i class="bi bi-arrow-up"></i> Tahmin çok yüksek:
@@ -118,36 +160,15 @@
                                         <i class="bi bi-check-circle"></i> Tam isabet!
                                     </span>
                                 </div>
-                                <div th:unless="${forecast.forecastedQuantity != null}" class="text-muted">
-                                    Tahmin edilen miktar geçersiz olduğundan sapma hesaplanamıyor.
+                                <div th:unless="${forecast.forecastedQuantity != null && forecast.actualQuantity != null}" class="text-muted">
+                                    Sapma hesaplanamıyor. Tahmin edilen veya gerçekleşen miktar eksik.
                                 </div>
                             </div>
                         </div>
                         
                         <div th:unless="${forecast.actualQuantity != null}" class="alert alert-info">
-                            <i class="bi bi-info-circle"></i> Performans bilgisi için gerçekleşen satış miktarını girmeniz gerekmektedir.
+                            <i class="bi bi-info-circle"></i> Tahmin döneminin sona ermesini bekleyin. Gerçekleşen satış miktarı dönem sonunda otomatik olarak hesaplanacaktır.
                         </div>
-                    </div>
-                </div>
-                
-                <div class="card mb-4">
-                    <div class="card-header bg-light">
-                        <h5 class="mb-0">Gerçekleşen Miktarı Güncelle</h5>
-                    </div>
-                    <div class="card-body">
-                        <form th:action="@{/forecasts/{id}/update-actual(id=${forecast.id})}" method="post">
-                            <div class="mb-3">
-                                <label for="actualQuantity" class="form-label">Gerçekleşen Satış Miktarı</label>
-                                <input type="number" class="form-control" id="actualQuantity" name="actualQuantity" 
-                                       min="0" th:value="${forecast.actualQuantity}" required>
-                            </div>
-                            
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="bi bi-save"></i> Güncelle
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
                 
@@ -161,10 +182,171 @@
                         </a>
                     </div>
                 </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Hareketli Ortalama Yöntemi</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="small">
+                            Hareketli Ortalama Yöntemi, uzak geçmişten çok, yakın geçmişe ağırlık verir ve buna dayanarak, bir dönem için satış tahminini yapar.
+                        </p>
+                        <div class="text-center">
+                            <img src="https://latex.codecogs.com/png.latex?HO(n)=\frac{y_t+y_{t-1}+...+y_{t-n+1}}{n}" class="img-fluid mb-2" alt="Moving Average Formula">
+                        </div>
+                        <p class="small">
+                            <b>HO(n)</b>: n periyotlu hareketli ortalama<br>
+                            <b>y<sub>t</sub></b>: t anında gerçekleşen talep miktarı<br>
+                            <b>n</b>: Periyot sayısı
+                        </p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
     
     <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <!-- Chart.js script for the sales forecast chart -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get forecast data from Thymeleaf
+            const forecast = /*[[${forecast}]]*/ {};
+            const historicalSales = /*[[${historicalSales}]]*/ [];
+            
+            // Prepare data for the chart
+            const labels = [];
+            const salesData = [];
+            
+            // Add historical data
+            historicalSales.forEach(function(sale) {
+                labels.push(sale[0]);
+                salesData.push(sale[1]);
+            });
+            
+            // Add forecast point
+            const forecastPeriod = forecast.forecastPeriodStart.substring(0, 7); // Format to YYYY-MM
+            labels.push(forecastPeriod);
+            
+            // Create forecast data array with nulls for historical periods and the forecast value
+            const forecastData = Array(labels.length - 1).fill(null);
+            forecastData.push(forecast.forecastedQuantity);
+            
+            // Add actual data if available
+            const actualData = Array(labels.length).fill(null);
+            if (forecast.actualQuantity !== null) {
+                actualData[labels.length - 1] = forecast.actualQuantity;
+            }
+            
+            // Calculate moving average trend line
+            const movingAverageData = [];
+            const n = forecast.numberOfPeriods;
+            
+            for (let i = 0; i < salesData.length; i++) {
+                if (i < n - 1) {
+                    movingAverageData.push(null);
+                } else {
+                    let sum = 0;
+                    for (let j = 0; j < n; j++) {
+                        sum += salesData[i - j];
+                    }
+                    movingAverageData.push(sum / n);
+                }
+            }
+            
+            // Create the chart
+            const ctx = document.getElementById('salesForecastChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Geçmiş Satışlar',
+                            data: salesData,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.1,
+                            fill: true
+                        },
+                        {
+                            label: 'Hareketli Ortalama',
+                            data: movingAverageData,
+                            borderColor: 'rgba(255, 159, 64, 1)',
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Tahmin',
+                            data: forecastData,
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            pointStyle: 'triangle',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            fill: false
+                        },
+                        {
+                            label: 'Gerçekleşen',
+                            data: actualData,
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            pointStyle: 'star',
+                            pointRadius: 8,
+                            pointHoverRadius: 10,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Satış Adedi'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Dönem'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: forecast.brand + ' ' + forecast.model + ' Satış Tahmin Grafiği',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                },
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.y !== null) {
+                                        label += context.parsed.y + ' adet';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html> 

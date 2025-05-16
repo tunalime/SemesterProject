@@ -12,7 +12,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller for sales forecasting operations
@@ -37,6 +39,9 @@ public class ForecastController {
     public String showForecastForm(Model model) {
         // Populate dropdown options for vehicle attributes
         model.addAttribute("brands", vehicleRepository.findAllDistinctBrands());
+        
+        // Add default periods options
+        model.addAttribute("periodOptions", new Integer[]{3, 4, 5, 6, 12});
         return "forecasts/generate";
     }
     
@@ -84,10 +89,10 @@ public class ForecastController {
                                  RedirectAttributes redirectAttributes) {
         try {
             SalesForecast forecast = forecastService.forecastNextMonthSales(brand, model, packageType, year, numberOfPeriods);
-            redirectAttributes.addFlashAttribute("successMessage", "Forecast generated successfully");
+            redirectAttributes.addFlashAttribute("successMessage", "Tahmin başarıyla oluşturuldu");
             return "redirect:/forecasts/" + forecast.getId();
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error generating forecast: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Tahmin oluşturulurken hata oluştu: " + e.getMessage());
             return "redirect:/forecasts/generate";
         }
     }
@@ -98,25 +103,63 @@ public class ForecastController {
     @GetMapping("/{id}")
     public String getForecastDetails(@PathVariable Long id, Model model) {
         SalesForecast forecast = forecastService.getSalesForecastById(id);
+        
+        // Get historical sales data for chart
+        List<Object[]> historicalSales = forecastService.getHistoricalSalesByMonth(
+            forecast.getBrand(), 
+            forecast.getModel(), 
+            forecast.getPackageType(), 
+            forecast.getYear(),
+            forecast.getNumberOfPeriods()
+        );
+        
         model.addAttribute("forecast", convertToDTO(forecast));
+        model.addAttribute("historicalSales", historicalSales);
+        
         return "forecasts/details";
     }
     
     /**
-     * Update forecast with actual sales
+     * Get historical sales data for a specific vehicle configuration (AJAX)
      */
-    @PostMapping("/{id}/update-actual")
-    public String updateForecastWithActual(@PathVariable Long id,
-                                         @RequestParam Integer actualQuantity,
-                                         RedirectAttributes redirectAttributes) {
-        try {
-            SalesForecast forecast = forecastService.updateForecastWithActual(id, actualQuantity);
-            redirectAttributes.addFlashAttribute("successMessage", "Forecast updated with actual sales");
-            return "redirect:/forecasts/" + forecast.getId();
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Error updating forecast: " + e.getMessage());
-            return "redirect:/forecasts/" + id;
-        }
+    @GetMapping("/api/historical-sales")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getHistoricalSalesData(
+            @RequestParam String brand,
+            @RequestParam String model,
+            @RequestParam String packageType,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(defaultValue = "12") Integer months) {
+        
+        List<Object[]> historicalData = forecastService.getHistoricalSalesByMonth(
+            brand, model, packageType, year, months);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("brand", brand);
+        response.put("model", model);
+        response.put("packageType", packageType);
+        response.put("year", year);
+        response.put("historicalData", historicalData);
+        
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    /**
+     * Generate forecast via API (AJAX)
+     */
+    @PostMapping("/api/generate")
+    @ResponseBody
+    public ResponseEntity<SalesForecastDTO> generateForecastApi(
+            @RequestParam String brand,
+            @RequestParam String model,
+            @RequestParam String packageType,
+            @RequestParam(required = false) Integer year,
+            @RequestParam Integer numberOfPeriods) {
+        
+        SalesForecast forecast = forecastService.forecastNextMonthSales(
+            brand, model, packageType, year, numberOfPeriods);
+        
+        return new ResponseEntity<>(convertToDTO(forecast), HttpStatus.OK);
     }
     
     /**
