@@ -64,6 +64,30 @@
                         </div>
                     </div>
                     
+                    <!-- Fiyat özeti bilgisi -->
+                    <div class="row mb-4" id="price-summary" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="card bg-light">
+                                <div class="card-body py-2">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Araç Liste Fiyatı:</small>
+                                            <p class="mb-0" id="original-price-display">₺0</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">İndirim:</small>
+                                            <p class="mb-0 text-danger" id="discount-display">₺0</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <small class="text-muted">Net Satış Fiyatı:</small>
+                                            <p class="mb-0 fw-bold text-success" id="final-price-display">₺0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="mb-3">
                         <label for="paymentMethod" class="form-label">Ödeme Yöntemi</label>
                         <select id="paymentMethod" name="paymentMethod" class="form-select" required>
@@ -88,14 +112,68 @@
     <footer th:replace="fragments/layout :: footer"></footer>
     
     <script>
-        // Set the sale price automatically when a vehicle is selected
+        // Global değişkenler
+        let originalPrice = 0;
+        let vehicleId = null;
+        
+        // Fiyat bilgilerini formatla
+        function formatPrice(price) {
+            return '₺' + parseFloat(price).toLocaleString('tr-TR');
+        }
+        
+        // Fiyat özetini güncelle
+        function updatePriceSummary() {
+            const salePrice = parseFloat(document.getElementById('salePrice').value) || 0;
+            const discount = parseFloat(document.getElementById('discount').value) || 0;
+            
+            // Eğer satış fiyatı veya indirim girdiyse özet göster
+            if (salePrice > 0 || discount > 0) {
+                document.getElementById('price-summary').style.display = 'block';
+                
+                // Orijinal fiyat, indirim ve nihai fiyatı göster
+                document.getElementById('original-price-display').innerText = formatPrice(originalPrice);
+                document.getElementById('discount-display').innerText = formatPrice(discount);
+                document.getElementById('final-price-display').innerText = formatPrice(salePrice);
+            } else {
+                document.getElementById('price-summary').style.display = 'none';
+            }
+        }
+        
+        // Araç seçildiğinde fiyatı ayarla
         document.getElementById('vehicleId').addEventListener('change', function() {
             const selectedOption = this.options[this.selectedIndex];
-            const priceText = selectedOption.text.split('₺')[1];
-            if (priceText) {
-                const price = priceText.replace(/,/g, '');
-                document.getElementById('salePrice').value = price;
+            if (!selectedOption.value) {
+                originalPrice = 0;
+                document.getElementById('salePrice').value = '';
+                document.getElementById('discount').value = '';
+                document.getElementById('price-summary').style.display = 'none';
+                return;
             }
+            
+            vehicleId = selectedOption.value;
+            const priceText = selectedOption.text.split('₺')[1];
+            
+            if (priceText) {
+                originalPrice = parseFloat(priceText.replace(/,/g, '').replace(/\./g, ''));
+                document.getElementById('salePrice').value = originalPrice;
+                updatePriceSummary();
+            }
+        });
+        
+        // İndirim girildiğinde satış fiyatını güncelle
+        document.getElementById('discount').addEventListener('input', function() {
+            const discount = parseFloat(this.value) || 0;
+            const newSalePrice = Math.max(0, originalPrice - discount);
+            document.getElementById('salePrice').value = newSalePrice;
+            updatePriceSummary();
+        });
+        
+        // Satış fiyatı değiştirildiğinde indirim miktarını güncelle
+        document.getElementById('salePrice').addEventListener('input', function() {
+            const salePrice = parseFloat(this.value) || 0;
+            const newDiscount = Math.max(0, originalPrice - salePrice);
+            document.getElementById('discount').value = newDiscount;
+            updatePriceSummary();
         });
     </script>
 </body>
