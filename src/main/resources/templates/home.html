@@ -76,11 +76,6 @@
                         <div class="d-none" id="monthlySalesData" th:attr="data-sales=${monthlySales}"></div>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="row">
-            <div class="col-md-6">
                 <div class="card mb-4">
                     <div class="card-header">
                         <h5>Hızlı Erişim</h5>
@@ -91,22 +86,6 @@
                             <a th:href="@{/customers/add}" class="list-group-item list-group-item-action">Yeni Müşteri Ekle</a>
                             <a th:href="@{/vehicles/test-drive}" class="list-group-item list-group-item-action">Test Sürüşü Planla</a>
                             <a th:href="@{/forecasts/generate}" class="list-group-item list-group-item-action">Satış Tahmini Oluştur</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5>Satış Durumu</h5>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="salesStatusChart"></canvas>
-                        <!-- Hidden data for chart -->
-                        <div class="d-none">
-                            <span id="completedSales" th:text="${completedSales}">0</span>
-                            <span id="pendingSales" th:text="${pendingSales}">0</span>
-                            <span id="otherSales" th:text="${totalSales - completedSales - pendingSales}">0</span>
                         </div>
                     </div>
                 </div>
