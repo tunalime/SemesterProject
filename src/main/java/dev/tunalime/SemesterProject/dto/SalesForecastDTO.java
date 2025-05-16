@@ -24,7 +24,6 @@ public class SalesForecastDTO {
     private Integer actualQuantity;
     private Integer numberOfPeriods;
     private LocalDate creationDate;
-    private String notes;
     
     // Calculate accuracy if both forecasted and actual quantities are available
     public Double getAccuracy() {
