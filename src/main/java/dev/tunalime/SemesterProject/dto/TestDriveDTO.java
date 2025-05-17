@@ -16,14 +16,13 @@ import java.time.LocalDateTime;
 public class TestDriveDTO {
     private Long id;
     private Long customerId;
-    private String customerName; // Combined first and last name for display
+    private String customerName;
     private Long vehicleId;
-    private String vehicleInfo; // Combined brand, model, year for display
+    private String vehicleInfo;
     private LocalDateTime scheduledDateTime;
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
     private TestDriveStatus status;
     private String customerFeedback;
-    private String notes;
     private String staffMemberName;
 } 

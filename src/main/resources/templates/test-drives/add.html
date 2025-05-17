@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/layout :: head('Test Sürüşü Planla')">
+    <meta charset="UTF-8">
+    <title>Test Sürüşü Planla</title>
+</head>
+<body>
+    <nav th:replace="fragments/layout :: navbar('test-drives')"></nav>
+
+    <div class="container my-4">
+        <div th:replace="fragments/layout :: alerts"></div>
+        
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Test Sürüşü Planla</h1>
+            <div>
+                <a th:href="@{/test-drives}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Listeye Dön
+                </a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Test Sürüş Bilgileri</h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/test-drives/add}" th:object="${testDrive}" method="post" class="needs-validation" novalidate>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="customerId" class="form-label">Müşteri <span class="text-danger">*</span></label>
+                            <select class="form-select" id="customerId" th:field="*{customerId}" required>
+                                <option value="" selected disabled>Müşteri seçiniz</option>
+                                <option th:each="customer : ${customers}" 
+                                        th:value="${customer.id}" 
+                                        th:text="${customer.firstName + ' ' + customer.lastName}"
+                                        th:selected="${customer.id == testDrive.customerId}">
+                                    Ahmet Yılmaz
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Lütfen bir müşteri seçiniz.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vehicleId" class="form-label">Araç <span class="text-danger">*</span></label>
+                            <select class="form-select" id="vehicleId" th:field="*{vehicleId}" required>
+                                <option value="" selected disabled>Araç seçiniz</option>
+                                <option th:each="vehicle : ${availableVehicles}" 
+                                        th:value="${vehicle.id}" 
+                                        th:text="${vehicle.brand + ' ' + vehicle.model + ' ' + vehicle.year}"
+                                        th:selected="${vehicle.id == testDrive.vehicleId}">
+                                    Renault Clio 2023
+                                </option>
+                            </select>
+                            <div class="invalid-feedback">Lütfen bir araç seçiniz.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="scheduledDateTime" class="form-label">Tarih ve Saat <span class="text-danger">*</span></label>
+                            <input type="datetime-local" class="form-control" id="scheduledDateTime" th:field="*{scheduledDateTime}" required>
+                            <div class="invalid-feedback">Lütfen geçerli bir tarih ve saat giriniz.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="staffMemberName" class="form-label">Sorumlu Personel <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="staffMemberName" th:field="*{staffMemberName}" required>
+                            <div class="invalid-feedback">Lütfen bir personel adı giriniz.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="customerFeedback" class="form-label">Notlar</label>
+                        <textarea class="form-control" id="customerFeedback" th:field="*{customerFeedback}" rows="3" 
+                                  placeholder="Müşteri talepleri veya özel notlar"></textarea>
+                    </div>
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-calendar-check"></i> Test Sürüşü Planla
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <footer th:replace="fragments/layout :: footer"></footer>
+    
+    <!-- Form validation script -->
+    <script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+    (function () {
+        'use strict'
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        var forms = document.querySelectorAll('.needs-validation')
+
+        // Loop over them and prevent submission
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+    </script>
+</body>
+</html> 
